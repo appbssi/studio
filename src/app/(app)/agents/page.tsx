@@ -9,10 +9,24 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search } from 'lucide-react';
+import { Search, Trash2 } from 'lucide-react';
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+  AlertDialogTrigger,
+} from "@/components/ui/alert-dialog";
+import { Button } from '@/components/ui/button';
+import { useToast } from '@/hooks/use-toast';
 
 export default function AgentsPage() {
-  const { agents } = useData();
+  const { agents, deleteAgent } = useData();
+  const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
   const filteredAgents = useMemo(() => {
@@ -24,6 +38,14 @@ export default function AgentsPage() {
       agent.contact.toLowerCase().includes(searchTerm.toLowerCase())
     );
   }, [agents, searchTerm]);
+
+  const handleDeleteAgent = (agentId: string, agentName: string) => {
+    deleteAgent(agentId);
+    toast({
+      title: "Agent Supprimé",
+      description: `L'agent ${agentName} a été supprimé.`,
+    });
+  }
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -55,6 +77,7 @@ export default function AgentsPage() {
                 <TableHead>Contact</TableHead>
                 <TableHead>Adresse</TableHead>
                 <TableHead>Statut</TableHead>
+                <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -81,11 +104,33 @@ export default function AgentsPage() {
                         {agent.status === 'available' ? 'Disponible' : 'Occupé'}
                       </Badge>
                     </TableCell>
+                    <TableCell className="text-right">
+                       <AlertDialog>
+                        <AlertDialogTrigger asChild>
+                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                              <Trash2 className="h-4 w-4" />
+                           </Button>
+                        </AlertDialogTrigger>
+                        <AlertDialogContent>
+                            <AlertDialogHeader>
+                                <AlertDialogTitle>Confirmer la suppression ?</AlertDialogTitle>
+                                <AlertDialogDescription>
+                                    Cette action supprimera définitivement l'agent "{agent.firstName} {agent.lastName}".
+                                    Cette action est irréversible.
+                                </AlertDialogDescription>
+                            </AlertDialogHeader>
+                            <AlertDialogFooter>
+                                <AlertDialogCancel>Annuler</AlertDialogCancel>
+                                <AlertDialogAction onClick={() => handleDeleteAgent(agent.id, `${agent.firstName} ${agent.lastName}`)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Supprimer</AlertDialogAction>
+                            </AlertDialogFooter>
+                        </AlertDialogContent>
+                      </AlertDialog>
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={5} className="text-center h-24">
+                  <TableCell colSpan={6} className="text-center h-24">
                     Aucun agent trouvé.
                   </TableCell>
                 </TableRow>

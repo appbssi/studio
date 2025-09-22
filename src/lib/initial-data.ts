@@ -1,5 +1,9 @@
 import { Agent, Mission } from './types';
 
+// This data is now used for seeding the database for the first time
+// or for local testing if Firestore is not available. 
+// The main data source is now Firestore.
+
 export const initialAgents: Agent[] = [
   { id: '1', firstName: 'John', lastName: 'Shepard', matricule: 'N7-001', contact: 'jshepard@alliance.mil', address: 'SSV Normandy SR-2', photoUrl: 'https://picsum.photos/seed/jshepard/400/400', status: 'available' },
   { id: '2', firstName: 'Garrus', lastName: 'Vakarian', matricule: 'CSEC-002', contact: 'gvakarian@citadel.sec', address: 'Normandy Main Battery', photoUrl: 'https://picsum.photos/seed/garrus/400/400', status: 'available' },

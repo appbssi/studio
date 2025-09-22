@@ -2,14 +2,26 @@
 
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { Agent, Mission } from '@/lib/types';
-import { initialAgents, initialMissions } from '@/lib/initial-data';
+import { db } from '@/lib/firebase';
+import {
+  collection,
+  getDocs,
+  addDoc,
+  updateDoc,
+  doc,
+  writeBatch,
+  query,
+  where,
+  deleteDoc
+} from 'firebase/firestore';
 
 interface DataContextProps {
   agents: Agent[];
   missions: Mission[];
-  addAgent: (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => void;
-  addMission: (missionData: Omit<Mission, 'id' | 'status'>) => void;
-  completeMission: (missionId: string) => void;
+  addAgent: (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => Promise<void>;
+  addMission: (missionData: Omit<Mission, 'id' | 'status'>) => Promise<void>;
+  completeMission: (missionId: string) => Promise<void>;
+  deleteAgent: (agentId: string) => Promise<void>;
   getAgentById: (agentId: string) => Agent | undefined;
   getMissionById: (missionId: string) => Mission | undefined;
 }
@@ -22,61 +34,55 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    try {
-      const savedAgents = localStorage.getItem('agents');
-      const savedMissions = localStorage.getItem('missions');
+    const fetchData = async () => {
+      try {
+        const agentsCollection = collection(db, 'agents');
+        const agentsSnapshot = await getDocs(agentsCollection);
+        const agentsList = agentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Agent));
+        setAgents(agentsList);
 
-      if (savedAgents && savedAgents !== '[]') {
-        setAgents(JSON.parse(savedAgents));
-      } else {
-        setAgents(initialAgents);
-      }
+        const missionsCollection = collection(db, 'missions');
+        const missionsSnapshot = await getDocs(missionsCollection);
+        const missionsList = missionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Mission));
+        setMissions(missionsList);
 
-      if (savedMissions && savedMissions !== '[]') {
-        setMissions(JSON.parse(savedMissions));
-      } else {
-        setMissions(initialMissions);
+      } catch (error) {
+        console.error("Failed to load data from Firestore", error);
+      } finally {
+        setIsLoaded(true);
       }
-    } catch (error) {
-      console.error("Failed to load data from localStorage", error);
-      setAgents(initialAgents);
-      setMissions(initialMissions);
-    } finally {
-      setIsLoaded(true);
-    }
+    };
+    fetchData();
   }, []);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('agents', JSON.stringify(agents));
-    }
-  }, [agents, isLoaded]);
-
-  useEffect(() => {
-    if (isLoaded) {
-      localStorage.setItem('missions', JSON.stringify(missions));
-    }
-  }, [missions, isLoaded]);
-
-  const addAgent = (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => {
-    const id = Date.now().toString();
-    const newAgent: Agent = {
-      id,
+  
+  const addAgent = async (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => {
+    const id = Date.now().toString(); // Temporary for photo URL
+    const newAgentData = {
       ...agentData,
-      status: 'available',
+      status: 'available' as const,
       photoUrl: `https://picsum.photos/seed/${id}/400/400`,
     };
+    const docRef = await addDoc(collection(db, 'agents'), newAgentData);
+    const newAgent: Agent = { id: docRef.id, ...newAgentData };
     setAgents(prev => [...prev, newAgent]);
   };
 
-  const addMission = (missionData: Omit<Mission, 'id' | 'status'>) => {
-    const id = Date.now().toString();
-    const newMission: Mission = {
-      id,
+  const addMission = async (missionData: Omit<Mission, 'id' | 'status'>) => {
+    const newMissionData = {
       ...missionData,
-      status: 'planned'
+      status: 'planned' as const,
     };
+    const docRef = await addDoc(collection(db, 'missions'), newMissionData);
+    const newMission: Mission = { id: docRef.id, ...newMissionData };
     setMissions(prev => [...prev, newMission]);
+
+    const batch = writeBatch(db);
+    newMission.agentIds.forEach(agentId => {
+      const agentRef = doc(db, 'agents', agentId);
+      batch.update(agentRef, { status: 'occupied', currentMissionId: newMission.id });
+    });
+    await batch.commit();
+
     setAgents(prev =>
       prev.map(agent =>
         newMission.agentIds.includes(agent.id)
@@ -86,15 +92,25 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     );
   };
   
-  const completeMission = (missionId: string) => {
+  const completeMission = async (missionId: string) => {
     const mission = missions.find(m => m.id === missionId);
     if (!mission) return;
+
+    const missionRef = doc(db, 'missions', missionId);
+    await updateDoc(missionRef, { status: 'completed' });
 
     setMissions(prev =>
       prev.map(m =>
         m.id === missionId ? { ...m, status: 'completed' } : m
       )
     );
+
+    const batch = writeBatch(db);
+    mission.agentIds.forEach(agentId => {
+        const agentRef = doc(db, 'agents', agentId);
+        batch.update(agentRef, { status: 'available', currentMissionId: undefined });
+    });
+    await batch.commit();
 
     setAgents(prev =>
       prev.map(agent =>
@@ -103,6 +119,34 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
           : agent
       )
     );
+  };
+
+  const deleteAgent = async (agentId: string) => {
+    // Note: This is a simplified deletion. In a real-world scenario, you'd want to handle
+    // what happens if the agent is on an active mission. For this app, we'll assume
+    // you can only delete agents who are not on active missions or handle it client-side.
+    
+    // First, remove the agent from any missions they are assigned to
+    const updatedMissions = missions.map(m => ({
+        ...m,
+        agentIds: m.agentIds.filter(id => id !== agentId)
+    }));
+    
+    const batch = writeBatch(db);
+    missions.forEach(mission => {
+        if(mission.agentIds.includes(agentId)) {
+            const missionRef = doc(db, 'missions', mission.id);
+            batch.update(missionRef, {
+                agentIds: mission.agentIds.filter(id => id !== agentId)
+            });
+        }
+    })
+    await batch.commit();
+    setMissions(updatedMissions);
+
+    // Then, delete the agent document
+    await deleteDoc(doc(db, "agents", agentId));
+    setAgents(prev => prev.filter(a => a.id !== agentId));
   };
 
   const getAgentById = (agentId: string) => agents.find(a => a.id === agentId);
@@ -117,7 +161,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <DataContext.Provider value={{ agents, missions, addAgent, addMission, completeMission, getAgentById, getMissionById }}>
+    <DataContext.Provider value={{ agents, missions, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById }}>
       {children}
     </DataContext.Provider>
   );
