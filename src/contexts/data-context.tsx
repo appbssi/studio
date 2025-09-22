@@ -12,7 +12,9 @@ import {
   writeBatch,
   query,
   where,
-  deleteDoc
+  deleteDoc,
+  FieldValue,
+  deleteField,
 } from 'firebase/firestore';
 
 interface DataContextProps {
@@ -108,7 +110,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const batch = writeBatch(db);
     mission.agentIds.forEach(agentId => {
         const agentRef = doc(db, 'agents', agentId);
-        batch.update(agentRef, { status: 'available', currentMissionId: undefined });
+        batch.update(agentRef, { status: 'available', currentMissionId: deleteField() });
     });
     await batch.commit();
 
@@ -122,25 +124,17 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   };
 
   const deleteAgent = async (agentId: string) => {
-    // Note: This is a simplified deletion. In a real-world scenario, you'd want to handle
-    // what happens if the agent is on an active mission. For this app, we'll assume
-    // you can only delete agents who are not on active missions or handle it client-side.
-    
     // First, remove the agent from any missions they are assigned to
-    const updatedMissions = missions.map(m => ({
-        ...m,
-        agentIds: m.agentIds.filter(id => id !== agentId)
-    }));
-    
     const batch = writeBatch(db);
-    missions.forEach(mission => {
-        if(mission.agentIds.includes(agentId)) {
+    const updatedMissions = missions.map(mission => {
+        if (mission.agentIds.includes(agentId)) {
+            const updatedAgentIds = mission.agentIds.filter(id => id !== agentId);
             const missionRef = doc(db, 'missions', mission.id);
-            batch.update(missionRef, {
-                agentIds: mission.agentIds.filter(id => id !== agentId)
-            });
+            batch.update(missionRef, { agentIds: updatedAgentIds });
+            return { ...mission, agentIds: updatedAgentIds };
         }
-    })
+        return mission;
+    });
     await batch.commit();
     setMissions(updatedMissions);
 
