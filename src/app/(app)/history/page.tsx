@@ -113,7 +113,6 @@ export default function HistoryPage() {
                         <TableHead>Mission</TableHead>
                         <TableHead>Période</TableHead>
                         <TableHead>Durée</TableHead>
-                        <TableHead>Participants</TableHead>
                     </TableRow>
                     </TableHeader>
                     <TableBody>
@@ -126,21 +125,11 @@ export default function HistoryPage() {
                             </TableCell>
                             <TableCell>{new Date(mission.startDate).toLocaleDateString('fr-FR')}</TableCell>
                             <TableCell>{calculateDuration(mission.startDate, mission.endDate)} jour(s)</TableCell>
-                            <TableCell>
-                            <div className="flex flex-col">
-                                {mission.agentIds.map(agentId => {
-                                    const agent = agents.find(a => a.id === agentId);
-                                    return agent ? (
-                                    <span key={agentId} className="text-sm">{agent.firstName} {agent.lastName}</span>
-                                    ) : null;
-                                })}
-                            </div>
-                            </TableCell>
                         </TableRow>
                         ))
                     ) : (
                         <TableRow>
-                        <TableCell colSpan={4} className="h-24 text-center">
+                        <TableCell colSpan={3} className="h-24 text-center">
                             Aucune mission terminée à afficher.
                         </TableCell>
                         </TableRow>

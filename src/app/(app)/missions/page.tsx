@@ -61,7 +61,7 @@ export default function MissionsPage() {
     if (!isLoaded) {
       return (
         <TableRow>
-          <TableCell colSpan={5} className="text-center h-24">
+          <TableCell colSpan={4} className="text-center h-24">
             Chargement des missions...
           </TableCell>
         </TableRow>
@@ -77,16 +77,6 @@ export default function MissionsPage() {
           <TableCell>{getStatusBadge(mission.status)}</TableCell>
           <TableCell>
             {new Date(mission.startDate).toLocaleDateString('fr-FR')} - {new Date(mission.endDate).toLocaleDateString('fr-FR')}
-          </TableCell>
-          <TableCell>
-            <div className="flex flex-col">
-                {mission.agentIds.map(agentId => {
-                  const agent = agents.find(a => a.id === agentId);
-                  return agent ? (
-                    <span key={agentId} className="text-sm">{agent.firstName} {agent.lastName}</span>
-                  ) : null;
-                })}
-            </div>
           </TableCell>
           <TableCell className="text-right space-x-2">
             <MissionAgentsDialog mission={mission} />
@@ -119,7 +109,7 @@ export default function MissionsPage() {
     } else {
       return (
         <TableRow>
-          <TableCell colSpan={5} className="text-center h-24">
+          <TableCell colSpan={4} className="text-center h-24">
             Aucune mission trouvée.
           </TableCell>
         </TableRow>
@@ -155,7 +145,6 @@ export default function MissionsPage() {
                 <TableHead>Titre</TableHead>
                 <TableHead>Statut</TableHead>
                 <TableHead>Période</TableHead>
-                <TableHead>Agents</TableHead>
                 <TableHead className="text-right">Actions</TableHead>
               </TableRow>
             </TableHeader>
