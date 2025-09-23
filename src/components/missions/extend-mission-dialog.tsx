@@ -77,7 +77,7 @@ export function ExtendMissionDialog({ mission }: ExtendMissionDialogProps) {
             <DialogClose asChild>
                 <Button type="button" variant="secondary">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>Confirmer</Button>
+            <Button type="submit" onClick={handleSubmit} variant="super">Confirmer</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

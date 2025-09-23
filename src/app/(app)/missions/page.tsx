@@ -98,7 +98,7 @@ export default function MissionsPage() {
                       </AlertDialogHeader>
                       <AlertDialogFooter>
                           <AlertDialogCancel>Annuler</AlertDialogCancel>
-                          <AlertDialogAction onClick={() => handleCompleteMission(mission.id)}>Confirmer</AlertDialogAction>
+                          <AlertDialogAction onClick={() => handleCompleteMission(mission.id)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Confirmer</AlertDialogAction>
                       </AlertDialogFooter>
                   </AlertDialogContent>
                 </AlertDialog>

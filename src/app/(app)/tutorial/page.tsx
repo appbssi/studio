@@ -51,7 +51,7 @@ export default function TutorialPage() {
           {tutorial && <ReactMarkdown>{tutorial}</ReactMarkdown>}
         </CardContent>
         <CardFooter>
-          <Button onClick={handleGenerateTutorial} disabled={isLoading} className="w-full">
+          <Button onClick={handleGenerateTutorial} disabled={isLoading} className="w-full" variant="super">
               <Sparkles className="mr-2 h-4 w-4" />
               {isLoading ? 'Génération en cours...' : 'Générer le Tutoriel'}
           </Button>

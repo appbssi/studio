@@ -124,7 +124,7 @@ export function EditAgentDialog({ agent }: EditAgentDialogProps) {
             <DialogClose asChild>
                 <Button type="button" variant="secondary">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>Enregistrer</Button>
+            <Button type="submit" onClick={handleSubmit} variant="super">Enregistrer</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
