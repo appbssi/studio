@@ -214,7 +214,7 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
                 <FileDown className="mr-2 h-4 w-4" />
                 Exporter
             </Button>
-            <Button onClick={generateMissionOrder}>
+            <Button onClick={generateMissionOrder} variant="super">
                 <FileText className="mr-2 h-4 w-4" />
                 Générer l'Ordre de Mission
             </Button>

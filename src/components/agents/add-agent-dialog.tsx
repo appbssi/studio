@@ -67,7 +67,7 @@ export function AddAgentDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button>
+        <Button variant="super">
           <PlusCircle className="mr-2 h-4 w-4" />
           Ajouter un Agent
         </Button>
@@ -123,7 +123,7 @@ export function AddAgentDialog() {
             <DialogClose asChild>
                 <Button type="button" variant="secondary">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit}>Enregistrer l'Agent</Button>
+            <Button type="submit" onClick={handleSubmit} variant="super">Enregistrer l'Agent</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

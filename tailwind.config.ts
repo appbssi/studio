@@ -102,12 +102,17 @@ export default {
           '40%': {
             transform: 'scale(1.0)',
           }
+        },
+        'super-button-rotate': {
+            '0%': { transform: 'rotate(0deg)' },
+            '100%': { transform: 'rotate(360deg)' },
         }
       },
       animation: {
         'accordion-down': 'accordion-down 0.2s ease-out',
         'accordion-up': 'accordion-up 0.2s ease-out',
         'spinner-bounce': 'spinner-bounce 1.4s infinite ease-in-out both',
+        'super-button': 'super-button-rotate 4s linear infinite',
       },
     },
   },
