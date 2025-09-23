@@ -1,7 +1,7 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
-import { Agent, Mission } from '@/lib/types';
+import React, { createContext, useContext, useState, useEffect, ReactNode, useCallback } from 'react';
+import { Agent, Mission, AgentStatus } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import {
   collection,
@@ -10,19 +10,19 @@ import {
   doc,
   writeBatch,
   deleteDoc,
-  deleteField,
   onSnapshot,
 } from 'firebase/firestore';
 
 interface DataContextProps {
   agents: Agent[];
   missions: Mission[];
-  addAgent: (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => Promise<void>;
+  addAgent: (agentData: Omit<Agent, 'id' | 'photoUrl'>) => Promise<void>;
   addMission: (missionData: Omit<Mission, 'id' | 'status'>) => Promise<void>;
   completeMission: (missionId: string) => Promise<void>;
   deleteAgent: (agentId: string) => Promise<void>;
   getAgentById: (agentId: string) => Agent | undefined;
   getMissionById: (missionId: string) => Mission | undefined;
+  getAgentStatus: (agentId: string) => AgentStatus;
 }
 
 const DataContext = createContext<DataContextProps | undefined>(undefined);
@@ -54,18 +54,16 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       setIsLoaded(true);
     });
 
-    // Cleanup function to unsubscribe from listeners on component unmount
     return () => {
       unsubscribeAgents();
       unsubscribeMissions();
     };
-  }, []);
+  }, [isLoaded]);
   
-  const addAgent = async (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => {
-    const id = Date.now().toString(); // Temporary for photo URL
+  const addAgent = async (agentData: Omit<Agent, 'id' | 'photoUrl'>) => {
+    const id = Date.now().toString();
     const newAgentData = {
       ...agentData,
-      status: 'available' as const,
       photoUrl: `https://picsum.photos/seed/${id}/400/400`,
     };
     await addDoc(collection(db, 'agents'), newAgentData);
@@ -76,14 +74,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       ...missionData,
       status: 'planned' as const,
     };
-    const docRef = await addDoc(collection(db, 'missions'), newMissionData);
-    
-    const batch = writeBatch(db);
-    missionData.agentIds.forEach(agentId => {
-      const agentRef = doc(db, 'agents', agentId);
-      batch.update(agentRef, { status: 'occupied', currentMissionId: docRef.id });
-    });
-    await batch.commit();
+    await addDoc(collection(db, 'missions'), newMissionData);
   };
   
   const completeMission = async (missionId: string) => {
@@ -92,35 +83,32 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
 
     const missionRef = doc(db, 'missions', missionId);
     await updateDoc(missionRef, { status: 'completed' });
-
-    const batch = writeBatch(db);
-    mission.agentIds.forEach(agentId => {
-        const agentRef = doc(db, 'agents', agentId);
-        batch.update(agentRef, { status: 'available', currentMissionId: deleteField() });
-    });
-    await batch.commit();
   };
 
   const deleteAgent = async (agentId: string) => {
-    // First, remove the agent from any missions they are assigned to
     const batch = writeBatch(db);
-    const updatedMissions = missions.map(mission => {
+    missions.forEach(mission => {
         if (mission.agentIds.includes(agentId)) {
             const updatedAgentIds = mission.agentIds.filter(id => id !== agentId);
             const missionRef = doc(db, 'missions', mission.id);
             batch.update(missionRef, { agentIds: updatedAgentIds });
-            return { ...mission, agentIds: updatedAgentIds };
         }
-        return mission;
     });
     await batch.commit();
 
-    // Then, delete the agent document
     await deleteDoc(doc(db, "agents", agentId));
   };
 
   const getAgentById = (agentId: string) => agents.find(a => a.id === agentId);
   const getMissionById = (missionId: string) => missions.find(m => m.id === missionId);
+
+  const getAgentStatus = useCallback((agentId: string): AgentStatus => {
+    const isOccupied = missions.some(mission => 
+        mission.agentIds.includes(agentId) && 
+        (mission.status === 'planned' || mission.status === 'in-progress')
+    );
+    return isOccupied ? 'occupied' : 'available';
+  }, [missions]);
 
   if (!isLoaded) {
     return (
@@ -131,7 +119,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }
 
   return (
-    <DataContext.Provider value={{ agents, missions, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById }}>
+    <DataContext.Provider value={{ agents, missions, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
       {children}
     </DataContext.Provider>
   );

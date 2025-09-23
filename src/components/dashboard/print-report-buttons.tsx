@@ -3,19 +3,20 @@
 import { Button } from "@/components/ui/button";
 import { useData } from "@/contexts/data-context";
 import { Printer } from "lucide-react";
+import { Agent } from "@/lib/types";
 
 export function PrintReportButtons() {
-    const { agents, missions } = useData();
+    const { agents, missions, getAgentStatus } = useData();
 
     const printAgentsReport = (status: 'available' | 'occupied') => {
-        const filteredAgents = agents.filter(agent => agent.status === status);
+        const filteredAgents = agents.filter(agent => getAgentStatus(agent.id) === status);
         const printWindow = window.open('', '_blank');
         
         if (printWindow) {
           const missionTitles = filteredAgents.map(agent => {
-            if (status === 'occupied' && agent.currentMissionId) {
-              const mission = missions.find(m => m.id === agent.currentMissionId);
-              return mission ? mission.title : 'N/A';
+            if (status === 'occupied') {
+              const activeMission = missions.find(m => m.agentIds.includes(agent.id) && (m.status === 'in-progress' || m.status === 'planned'));
+              return activeMission ? activeMission.title : 'N/A';
             }
             return '';
           });

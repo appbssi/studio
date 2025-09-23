@@ -6,10 +6,10 @@ import { PrintReportButtons } from '@/components/dashboard/print-report-buttons'
 import { Users, UserCheck, UserX, Briefcase, CheckCircle } from 'lucide-react';
 
 export default function DashboardPage() {
-  const { agents, missions } = useData();
+  const { agents, missions, getAgentStatus } = useData();
 
-  const availableAgents = agents.filter(agent => agent.status === 'available').length;
-  const occupiedAgents = agents.filter(agent => agent.status === 'occupied').length;
+  const availableAgents = agents.filter(agent => getAgentStatus(agent.id) === 'available').length;
+  const occupiedAgents = agents.length - availableAgents;
   const activeMissions = missions.filter(mission => mission.status === 'in-progress' || mission.status === 'planned').length;
   const completedMissions = missions.filter(mission => mission.status === 'completed').length;
 

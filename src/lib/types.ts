@@ -1,3 +1,5 @@
+export type AgentStatus = 'available' | 'occupied';
+
 export interface Agent {
   id: string;
   firstName: string;
@@ -6,8 +8,6 @@ export interface Agent {
   contact: string;
   address: string;
   photoUrl: string;
-  status: 'available' | 'occupied';
-  currentMissionId?: string;
 }
 
 export interface Mission {

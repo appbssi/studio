@@ -24,7 +24,7 @@ import { Agent } from '@/lib/types';
 
 export function AddMissionDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const { addMission, agents } = useData();
+  const { addMission, agents, getAgentStatus } = useData();
   const { toast } = useToast();
   const [newMission, setNewMission] = useState({
     title: '',
@@ -74,8 +74,8 @@ export function AddMissionDialog() {
     setIsOpen(false);
   };
   
-  const availableAgents = agents.filter(agent => agent.status === 'available' || newMission.agentIds.includes(agent.id));
-
+  const availableAgents = agents.filter(agent => getAgentStatus(agent.id) === 'available' || newMission.agentIds.includes(agent.id));
+  
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
@@ -115,21 +115,27 @@ export function AddMissionDialog() {
             <div>
               <Label>Agents à Assigner *</Label>
               <ScrollArea className="h-40 w-full rounded-md border p-4 mt-2">
-                {availableAgents.map((agent: Agent) => (
-                  <div key={agent.id} className="flex items-center space-x-2 mb-2">
-                    <Checkbox
-                      id={`agent-${agent.id}`}
-                      checked={newMission.agentIds.includes(agent.id)}
-                      onCheckedChange={() => handleAgentSelectionChange(agent.id)}
-                      disabled={agent.status === 'occupied' && !newMission.agentIds.includes(agent.id)}
-                    />
-                    <label htmlFor={`agent-${agent.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
-                      {agent.firstName} {agent.lastName} ({agent.matricule})
-                      {agent.status === 'occupied' && !newMission.agentIds.includes(agent.id) && ' (Occupé)'}
-                    </label>
-                  </div>
-                ))}
-                {availableAgents.length === 0 && <p className='text-sm text-muted-foreground text-center py-4'>Aucun agent disponible.</p>}
+                {agents.map((agent: Agent) => {
+                  const status = getAgentStatus(agent.id);
+                  const isSelected = newMission.agentIds.includes(agent.id);
+                  const isDisabled = status === 'occupied' && !isSelected;
+
+                  return (
+                    <div key={agent.id} className="flex items-center space-x-2 mb-2">
+                      <Checkbox
+                        id={`agent-${agent.id}`}
+                        checked={isSelected}
+                        onCheckedChange={() => handleAgentSelectionChange(agent.id)}
+                        disabled={isDisabled}
+                      />
+                      <label htmlFor={`agent-${agent.id}`} className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                        {agent.firstName} {agent.lastName} ({agent.matricule})
+                        {isDisabled && ' (Occupé)'}
+                      </label>
+                    </div>
+                  )
+                })}
+                {agents.length === 0 && <p className='text-sm text-muted-foreground text-center py-4'>Aucun agent trouvé.</p>}
               </ScrollArea>
             </div>
         </div>

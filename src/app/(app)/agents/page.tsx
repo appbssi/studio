@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AgentsPage() {
-  const { agents, deleteAgent } = useData();
+  const { agents, deleteAgent, getAgentStatus } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -82,7 +82,9 @@ export default function AgentsPage() {
             </TableHeader>
             <TableBody>
               {filteredAgents.length > 0 ? (
-                filteredAgents.map(agent => (
+                filteredAgents.map(agent => {
+                  const status = getAgentStatus(agent.id);
+                  return (
                   <TableRow key={agent.id}>
                     <TableCell>
                       <div className="flex items-center gap-3">
@@ -100,8 +102,8 @@ export default function AgentsPage() {
                     <TableCell>{agent.contact}</TableCell>
                     <TableCell>{agent.address}</TableCell>
                     <TableCell>
-                      <Badge variant={agent.status === 'available' ? 'default' : 'secondary'} className={agent.status === 'available' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>
-                        {agent.status === 'available' ? 'Disponible' : 'Occupé'}
+                      <Badge variant={status === 'available' ? 'default' : 'secondary'} className={status === 'available' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>
+                        {status === 'available' ? 'Disponible' : 'Occupé'}
                       </Badge>
                     </TableCell>
                     <TableCell className="text-right">
@@ -127,7 +129,8 @@ export default function AgentsPage() {
                       </AlertDialog>
                     </TableCell>
                   </TableRow>
-                ))
+                  )
+                })
               ) : (
                 <TableRow>
                   <TableCell colSpan={6} className="text-center h-24">
