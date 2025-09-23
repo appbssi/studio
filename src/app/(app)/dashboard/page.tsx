@@ -30,10 +30,6 @@ export default function DashboardPage() {
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
-         <h2 className="text-xl font-semibold mb-4">Rapports</h2>
-         <p className="text-muted-foreground mb-4">
-            Générez des rapports sur l'état actuel de vos agents.
-         </p>
          <PrintReportButtons />
       </div>
     </div>
