@@ -23,6 +23,7 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
+import { MissionAgentsDialog } from '@/components/missions/mission-agents-dialog';
 
 export default function MissionsPage() {
   const { missions, agents, completeMission: completeMissionAction, isLoaded } = useData();
@@ -97,6 +98,7 @@ export default function MissionsPage() {
             </div>
           </TableCell>
           <TableCell className="text-right space-x-2">
+            <MissionAgentsDialog mission={mission} />
             {mission.status !== 'completed' && (
               <>
                 <ExtendMissionDialog mission={mission} />
