@@ -17,6 +17,7 @@ import {
   Briefcase,
   History,
   ShieldHalf,
+  BookOpen,
 } from 'lucide-react';
 
 const navItems = [
@@ -24,6 +25,7 @@ const navItems = [
   { href: '/agents', label: 'Gestion des Agents', icon: Users },
   { href: '/missions', label: 'Gestion des Missions', icon: Briefcase },
   { href: '/history', label: 'Historique', icon: History },
+  { href: '/tutorial', label: 'Tutoriel', icon: BookOpen },
 ];
 
 export default function AppSidebar() {
