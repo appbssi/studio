@@ -3,12 +3,22 @@
 import { Button } from "@/components/ui/button";
 import { useData } from "@/contexts/data-context";
 import { Printer } from "lucide-react";
+import { Agent } from "@/lib/types";
 
 export function PrintReportButtons() {
     const { agents, getAgentStatus } = useData();
+    
+    const sortAgents = (agentList: Agent[]) => {
+      return [...agentList].sort((a, b) => {
+        const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+        const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+    };
 
     const printAgentsReport = (status: 'available') => {
         const filteredAgents = agents.filter(agent => getAgentStatus(agent.id) === status);
+        const sortedAgents = sortAgents(filteredAgents);
         const printWindow = window.open('', '_blank');
         
         if (printWindow) {
@@ -38,7 +48,7 @@ export function PrintReportButtons() {
                     </tr>
                   </thead>
                   <tbody>
-                    ${filteredAgents.map((agent) => `
+                    ${sortedAgents.map((agent) => `
                       <tr>
                         <td>${agent.matricule}</td>
                         <td>${agent.lastName}</td>
@@ -58,6 +68,7 @@ export function PrintReportButtons() {
     };
 
     const printAllAgentsReport = () => {
+        const sortedAgents = sortAgents(agents);
         const printWindow = window.open('', '_blank');
         if (printWindow) {
           printWindow.document.write(`
@@ -87,7 +98,7 @@ export function PrintReportButtons() {
                     </tr>
                   </thead>
                   <tbody>
-                    ${agents.map((agent) => `
+                    ${sortedAgents.map((agent) => `
                       <tr>
                         <td>${agent.matricule}</td>
                         <td>${agent.lastName}</td>

@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
 import { Mission } from '@/lib/types';
 import {
@@ -22,7 +23,15 @@ interface MissionAgentsDialogProps {
 export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
   const { agents } = useData();
 
-  const participatingAgents = agents.filter(agent => mission.agentIds.includes(agent.id));
+  const participatingAgents = useMemo(() => {
+    return agents
+      .filter(agent => mission.agentIds.includes(agent.id))
+      .sort((a, b) => {
+        const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+        const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+      });
+  }, [agents, mission.agentIds]);
 
   const printAgentsList = () => {
     const printWindow = window.open('', '_blank');

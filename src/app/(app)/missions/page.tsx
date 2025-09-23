@@ -31,11 +31,16 @@ export default function MissionsPage() {
   const { toast } = useToast();
 
   const filteredMissions = useMemo(() => {
-    if (!searchTerm) return missions;
-    return missions.filter(mission =>
-      mission.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      mission.description.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    let filtered = [...missions];
+
+    if (searchTerm) {
+      filtered = filtered.filter(mission =>
+        mission.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        mission.description.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
+    
+    return filtered.sort((a, b) => a.title.localeCompare(b.title));
   }, [missions, searchTerm]);
   
   const handleCompleteMission = (missionId: string) => {

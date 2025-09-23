@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import {
   Dialog,
@@ -74,7 +74,13 @@ export function AddMissionDialog() {
     setIsOpen(false);
   };
   
-  const availableAgents = agents.filter(agent => getAgentStatus(agent.id) === 'available' || newMission.agentIds.includes(agent.id));
+  const sortedAgents = useMemo(() => {
+    return [...agents].sort((a, b) => {
+      const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+      const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+      return nameA.localeCompare(nameB);
+    });
+  }, [agents]);
   
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
@@ -115,7 +121,7 @@ export function AddMissionDialog() {
             <div>
               <Label>Agents à Assigner *</Label>
               <ScrollArea className="h-40 w-full rounded-md border p-4 mt-2">
-                {agents.map((agent: Agent) => {
+                {sortedAgents.map((agent: Agent) => {
                   const status = getAgentStatus(agent.id);
                   const isSelected = newMission.agentIds.includes(agent.id);
                   const isDisabled = status === 'occupied' && !isSelected;

@@ -41,14 +41,14 @@ export default function AgentsPage() {
 
   const uniqueGrades = useMemo(() => {
     const grades = new Set(agents.map(agent => agent.grade));
-    return ['all', ...Array.from(grades)];
+    return ['all', ...Array.from(grades).sort()];
   }, [agents]);
 
   const filteredAgents = useMemo(() => {
-    let filtered = agents;
+    let filtered = [...agents];
 
     if (statusFilter !== 'all') {
-      filtered = agents.filter(agent => getAgentStatus(agent.id) === statusFilter);
+      filtered = filtered.filter(agent => getAgentStatus(agent.id) === statusFilter);
     }
     
     if (selectedGrade !== 'all') {
@@ -64,7 +64,11 @@ export default function AgentsPage() {
       );
     }
 
-    return filtered;
+    return filtered.sort((a, b) => {
+        const nameA = `${a.lastName} ${a.firstName}`.toLowerCase();
+        const nameB = `${b.lastName} ${b.firstName}`.toLowerCase();
+        return nameA.localeCompare(nameB);
+    });
   }, [agents, getAgentStatus, searchTerm, selectedGrade, statusFilter]);
 
   const handleDeleteAgent = (agentId: string, agentName: string) => {
