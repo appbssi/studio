@@ -16,7 +16,7 @@ export default function DashboardPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <h1 className="text-3xl font-bold mb-8">BASE DE DONNEE BSSI</h1>
+      <h1 className="text-3xl font-bold mb-8 text-center">BASE DE DONNEE BSSI</h1>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
         <StatCard title="Agents (Total)" value={totalAgents} icon={Users} color="text-primary" />
         <StatCard title="Agents Disponibles" value={availableAgents} icon={UserCheck} color="text-green-400" />
