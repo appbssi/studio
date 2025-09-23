@@ -6,7 +6,7 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
     <DataProvider>
       <SidebarProvider>
-        <div className="flex min-h-screen">
+        <div className="flex h-full">
           <AppSidebar />
           <main className="flex-1">
             {children}
