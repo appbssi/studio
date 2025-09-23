@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -19,7 +20,8 @@ import {
   BookOpen,
   Shield,
   ChevronsLeft,
-  ChevronsRight
+  ChevronsRight,
+  History
 } from 'lucide-react';
 import { useSidebar } from '@/components/ui/sidebar';
 
@@ -27,6 +29,7 @@ const navItems = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/agents', label: 'Gestion des Agents', icon: Users },
   { href: '/missions', label: 'Gestion des Missions', icon: Briefcase },
+  { href: '/history', label: 'Historique', icon: History },
   { href: '/tutorial', label: 'Tutoriel', icon: BookOpen },
 ];
 
@@ -52,9 +55,11 @@ export default function AppSidebar() {
 
   return (
     <Sidebar>
-      <SidebarHeader className="p-4">
-        <Link href="/dashboard" className="flex items-center gap-2">
-          <Shield className="h-8 w-8 text-accent" />
+      <SidebarHeader className="p-4 flex justify-center group-data-[collapsible=icon]:justify-start">
+        <Link href="/dashboard" className="flex items-center gap-3">
+          <div className="super-button !p-0 !w-12 !h-12 !gap-0">
+            <Shield className="h-8 w-8 text-accent" />
+          </div>
           <h1 className="text-xl font-bold text-white group-data-[collapsible=icon]:hidden">
             SYGES-BSSI
           </h1>
@@ -86,3 +91,4 @@ export default function AppSidebar() {
     </Sidebar>
   );
 }
+
