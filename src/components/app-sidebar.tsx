@@ -57,8 +57,9 @@ export default function AppSidebar() {
     <Sidebar>
       <SidebarHeader className="p-4 flex justify-center group-data-[collapsible=icon]:justify-start">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="super-button !p-0 !w-12 !h-12 !gap-0">
-            <Shield className="h-8 w-8 text-accent" />
+          <div className="relative flex items-center justify-center w-12 h-12">
+            <div className="absolute inset-0 bg-accent rounded-full"></div>
+            <Shield className="h-8 w-8 text-accent-foreground z-10" />
           </div>
           <h1 className="text-xl font-bold text-white group-data-[collapsible=icon]:hidden">
             SYGES-BSSI
