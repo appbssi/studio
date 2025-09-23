@@ -107,7 +107,6 @@ export default function AgentsPage() {
               </Avatar>
               <div>
                 <p className="font-medium">{agent.firstName} {agent.lastName}</p>
-                <p className="text-sm text-muted-foreground">ID: {agent.id}</p>
               </div>
             </div>
           </TableCell>
