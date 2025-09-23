@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
 import { Input } from '@/components/ui/input';
 import { AddAgentDialog } from '@/components/agents/add-agent-dialog';
+import { EditAgentDialog } from '@/components/agents/edit-agent-dialog';
 import { Agent, AgentStatus } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
@@ -117,7 +118,8 @@ export default function AgentsPage() {
           <TableCell>
             {getStatusBadge(getAgentStatus(agent.id))}
           </TableCell>
-          <TableCell className="text-right">
+          <TableCell className="text-right space-x-1">
+             <EditAgentDialog agent={agent} />
              <AlertDialog>
               <AlertDialogTrigger asChild>
                  <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">

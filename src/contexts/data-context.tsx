@@ -18,6 +18,7 @@ interface DataContextProps {
   missions: Mission[];
   isLoaded: boolean;
   addAgent: (agentData: Omit<Agent, 'id' | 'photoUrl'>) => Promise<void>;
+  updateAgent: (agentId: string, agentData: Omit<Agent, 'id' | 'photoUrl'>) => Promise<void>;
   addMission: (missionData: Omit<Mission, 'id' | 'status'>) => Promise<void>;
   completeMission: (missionId: string) => Promise<void>;
   extendMission: (missionId: string, newEndDate: string) => Promise<void>;
@@ -71,6 +72,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     await addDoc(collection(db, 'agents'), newAgentData);
   };
 
+  const updateAgent = async (agentId: string, agentData: Omit<Agent, 'id' | 'photoUrl'>) => {
+    const agentRef = doc(db, 'agents', agentId);
+    await updateDoc(agentRef, agentData);
+  };
+
   const addMission = async (missionData: Omit<Mission, 'id' | 'status'>) => {
     const newMissionData = {
       ...missionData,
@@ -115,7 +121,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [missions]);
 
   return (
-    <DataContext.Provider value={{ agents, missions, isLoaded, addAgent, addMission, completeMission, extendMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
+    <DataContext.Provider value={{ agents, missions, isLoaded, addAgent, updateAgent, addMission, completeMission, extendMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
       {children}
     </DataContext.Provider>
   );
