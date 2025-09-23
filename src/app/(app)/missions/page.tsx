@@ -9,8 +9,6 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { Search } from 'lucide-react';
 import {
   AlertDialog,
@@ -81,25 +79,13 @@ export default function MissionsPage() {
             {new Date(mission.startDate).toLocaleDateString('fr-FR')} - {new Date(mission.endDate).toLocaleDateString('fr-FR')}
           </TableCell>
           <TableCell>
-            <div className="flex items-center -space-x-2">
-              <TooltipProvider>
+            <div className="flex flex-col">
                 {mission.agentIds.map(agentId => {
                   const agent = agents.find(a => a.id === agentId);
                   return agent ? (
-                    <Tooltip key={agentId}>
-                      <TooltipTrigger asChild>
-                        <Avatar className="border-2 border-card">
-                          <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person" />
-                          <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
-                        </Avatar>
-                      </TooltipTrigger>
-                      <TooltipContent>
-                        <p>{agent.firstName} {agent.lastName}</p>
-                      </TooltipContent>
-                    </Tooltip>
+                    <span key={agentId} className="text-sm">{agent.firstName} {agent.lastName}</span>
                   ) : null;
                 })}
-              </TooltipProvider>
             </div>
           </TableCell>
           <TableCell className="text-right space-x-2">

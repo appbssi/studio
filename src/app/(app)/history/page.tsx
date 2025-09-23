@@ -13,8 +13,6 @@ import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Tooltip, TooltipProvider, TooltipTrigger, TooltipContent } from '@/components/ui/tooltip';
 import { AgentHistorySummary } from '@/components/history/agent-history-summary';
 
 type SortByType = 'date' | 'title';
@@ -129,25 +127,13 @@ export default function HistoryPage() {
                             <TableCell>{new Date(mission.startDate).toLocaleDateString('fr-FR')}</TableCell>
                             <TableCell>{calculateDuration(mission.startDate, mission.endDate)} jour(s)</TableCell>
                             <TableCell>
-                            <div className="flex items-center -space-x-2">
-                                <TooltipProvider>
-                                    {mission.agentIds.map(agentId => {
-                                        const agent = agents.find(a => a.id === agentId);
-                                        return agent ? (
-                                        <Tooltip key={agentId}>
-                                            <TooltipTrigger asChild>
-                                            <Avatar className="border-2 border-card">
-                                                <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person"/>
-                                                <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
-                                            </Avatar>
-                                            </TooltipTrigger>
-                                            <TooltipContent>
-                                            <p>{agent.firstName} {agent.lastName}</p>
-                                            </TooltipContent>
-                                        </Tooltip>
-                                        ) : null;
-                                    })}
-                                </TooltipProvider>
+                            <div className="flex flex-col">
+                                {mission.agentIds.map(agentId => {
+                                    const agent = agents.find(a => a.id === agentId);
+                                    return agent ? (
+                                    <span key={agentId} className="text-sm">{agent.firstName} {agent.lastName}</span>
+                                    ) : null;
+                                })}
                             </div>
                             </TableCell>
                         </TableRow>

@@ -12,7 +12,6 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Printer, FileDown, FileText } from 'lucide-react';
 import * as XLSX from 'xlsx';
 
@@ -196,10 +195,6 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
             {participatingAgents.length > 0 ? (
                 participatingAgents.map(agent => (
                     <div key={agent.id} className="flex items-center gap-4 p-2 rounded-md hover:bg-muted/50">
-                        <Avatar>
-                            <AvatarImage src={agent.photoUrl} alt={`${agent.firstName} ${agent.lastName}`} />
-                            <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
-                        </Avatar>
                         <div>
                             <p className="font-semibold">{agent.firstName} {agent.lastName}</p>
                             <p className="text-sm text-muted-foreground">{agent.grade} - {agent.matricule}</p>
