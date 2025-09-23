@@ -5,16 +5,13 @@ import { Agent, Mission } from '@/lib/types';
 import { db } from '@/lib/firebase';
 import {
   collection,
-  getDocs,
   addDoc,
   updateDoc,
   doc,
   writeBatch,
-  query,
-  where,
   deleteDoc,
-  FieldValue,
   deleteField,
+  onSnapshot,
 } from 'firebase/firestore';
 
 interface DataContextProps {
@@ -36,25 +33,32 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const agentsCollection = collection(db, 'agents');
-        const agentsSnapshot = await getDocs(agentsCollection);
-        const agentsList = agentsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Agent));
-        setAgents(agentsList);
+    const agentsCollection = collection(db, 'agents');
+    const missionsCollection = collection(db, 'missions');
 
-        const missionsCollection = collection(db, 'missions');
-        const missionsSnapshot = await getDocs(missionsCollection);
-        const missionsList = missionsSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Mission));
-        setMissions(missionsList);
+    const unsubscribeAgents = onSnapshot(agentsCollection, (snapshot) => {
+      const agentsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Agent));
+      setAgents(agentsList);
+      if(!isLoaded) setIsLoaded(true);
+    }, (error) => {
+      console.error("Failed to load agents from Firestore", error);
+      setIsLoaded(true);
+    });
 
-      } catch (error) {
-        console.error("Failed to load data from Firestore", error);
-      } finally {
-        setIsLoaded(true);
-      }
+    const unsubscribeMissions = onSnapshot(missionsCollection, (snapshot) => {
+      const missionsList = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() } as Mission));
+      setMissions(missionsList);
+      if(!isLoaded) setIsLoaded(true);
+    }, (error) => {
+      console.error("Failed to load missions from Firestore", error);
+      setIsLoaded(true);
+    });
+
+    // Cleanup function to unsubscribe from listeners on component unmount
+    return () => {
+      unsubscribeAgents();
+      unsubscribeMissions();
     };
-    fetchData();
   }, []);
   
   const addAgent = async (agentData: Omit<Agent, 'id' | 'status' | 'photoUrl'>) => {
@@ -64,9 +68,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       status: 'available' as const,
       photoUrl: `https://picsum.photos/seed/${id}/400/400`,
     };
-    const docRef = await addDoc(collection(db, 'agents'), newAgentData);
-    const newAgent: Agent = { id: docRef.id, ...newAgentData };
-    setAgents(prev => [...prev, newAgent]);
+    await addDoc(collection(db, 'agents'), newAgentData);
   };
 
   const addMission = async (missionData: Omit<Mission, 'id' | 'status'>) => {
@@ -75,23 +77,13 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
       status: 'planned' as const,
     };
     const docRef = await addDoc(collection(db, 'missions'), newMissionData);
-    const newMission: Mission = { id: docRef.id, ...newMissionData };
-    setMissions(prev => [...prev, newMission]);
-
+    
     const batch = writeBatch(db);
-    newMission.agentIds.forEach(agentId => {
+    missionData.agentIds.forEach(agentId => {
       const agentRef = doc(db, 'agents', agentId);
-      batch.update(agentRef, { status: 'occupied', currentMissionId: newMission.id });
+      batch.update(agentRef, { status: 'occupied', currentMissionId: docRef.id });
     });
     await batch.commit();
-
-    setAgents(prev =>
-      prev.map(agent =>
-        newMission.agentIds.includes(agent.id)
-          ? { ...agent, status: 'occupied', currentMissionId: newMission.id }
-          : agent
-      )
-    );
   };
   
   const completeMission = async (missionId: string) => {
@@ -101,26 +93,12 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     const missionRef = doc(db, 'missions', missionId);
     await updateDoc(missionRef, { status: 'completed' });
 
-    setMissions(prev =>
-      prev.map(m =>
-        m.id === missionId ? { ...m, status: 'completed' } : m
-      )
-    );
-
     const batch = writeBatch(db);
     mission.agentIds.forEach(agentId => {
         const agentRef = doc(db, 'agents', agentId);
         batch.update(agentRef, { status: 'available', currentMissionId: deleteField() });
     });
     await batch.commit();
-
-    setAgents(prev =>
-      prev.map(agent =>
-        mission.agentIds.includes(agent.id)
-          ? { ...agent, status: 'available', currentMissionId: undefined }
-          : agent
-      )
-    );
   };
 
   const deleteAgent = async (agentId: string) => {
@@ -136,11 +114,9 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
         return mission;
     });
     await batch.commit();
-    setMissions(updatedMissions);
 
     // Then, delete the agent document
     await deleteDoc(doc(db, "agents", agentId));
-    setAgents(prev => prev.filter(a => a.id !== agentId));
   };
 
   const getAgentById = (agentId: string) => agents.find(a => a.id === agentId);
