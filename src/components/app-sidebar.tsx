@@ -37,7 +37,7 @@ export default function AppSidebar() {
         <Link href="/dashboard" className="flex items-center gap-2">
           <ShieldHalf className="h-8 w-8 text-accent" />
           <h1 className="text-xl font-bold text-white group-data-[collapsible=icon]:hidden">
-            MissionControl
+            RH-BSSI
           </h1>
         </Link>
       </SidebarHeader>
