@@ -114,7 +114,7 @@ export function PrintReportButtons() {
             </Button>
             <Button onClick={printAllAgentsReport}>
                 <Printer className="mr-2 h-4 w-4" />
-                Imprimer le Rapport de Tous les Agents
+                AGENTS ENREGISTRES
             </Button>
         </div>
     )
