@@ -3,28 +3,19 @@
 import { Button } from "@/components/ui/button";
 import { useData } from "@/contexts/data-context";
 import { Printer } from "lucide-react";
-import { Agent } from "@/lib/types";
 
 export function PrintReportButtons() {
-    const { agents, missions, getAgentStatus } = useData();
+    const { agents, getAgentStatus } = useData();
 
-    const printAgentsReport = (status: 'available' | 'occupied') => {
+    const printAgentsReport = (status: 'available') => {
         const filteredAgents = agents.filter(agent => getAgentStatus(agent.id) === status);
         const printWindow = window.open('', '_blank');
         
         if (printWindow) {
-          const missionTitles = filteredAgents.map(agent => {
-            if (status === 'occupied') {
-              const activeMission = missions.find(m => m.agentIds.includes(agent.id) && (m.status === 'in-progress' || m.status === 'planned'));
-              return activeMission ? activeMission.title : 'N/A';
-            }
-            return '';
-          });
-    
           printWindow.document.write(`
             <html>
               <head>
-                <title>Rapport des Agents ${status === 'available' ? 'Disponibles' : 'Occupés'}</title>
+                <title>Rapport des Agents Disponibles</title>
                 <style>
                   body { font-family: 'Inter', sans-serif; margin: 20px; background-color: #1a1a1a; color: #f0f0f0; }
                   h1 { color: #30CED8; }
@@ -35,7 +26,7 @@ export function PrintReportButtons() {
                 </style>
               </head>
               <body>
-                <h1>État des Agents ${status === 'available' ? 'Disponibles' : 'Occupés'}</h1>
+                <h1>État des Agents Disponibles</h1>
                 <p>Date du rapport: ${new Date().toLocaleDateString('fr-FR')}</p>
                 <table>
                   <thead>
@@ -44,17 +35,15 @@ export function PrintReportButtons() {
                       <th>Nom</th>
                       <th>Prénom</th>
                       <th>Contact</th>
-                      ${status === 'occupied' ? '<th>Mission en cours</th>' : ''}
                     </tr>
                   </thead>
                   <tbody>
-                    ${filteredAgents.map((agent, index) => `
+                    ${filteredAgents.map((agent) => `
                       <tr>
                         <td>${agent.matricule}</td>
                         <td>${agent.lastName}</td>
                         <td>${agent.firstName}</td>
                         <td>${agent.contact}</td>
-                        ${status === 'occupied' ? `<td>${missionTitles[index]}</td>` : ''}
                       </tr>
                     `).join('')}
                   </tbody>
@@ -72,11 +61,7 @@ export function PrintReportButtons() {
         <div className="flex flex-col sm:flex-row gap-4">
             <Button onClick={() => printAgentsReport('available')}>
                 <Printer className="mr-2 h-4 w-4" />
-                Imprimer Agents Disponibles
-            </Button>
-            <Button variant="secondary" onClick={() => printAgentsReport('occupied')}>
-                <Printer className="mr-2 h-4 w-4" />
-                Imprimer Agents Occupés
+                Imprimer le Rapport des Agents
             </Button>
         </div>
     )
