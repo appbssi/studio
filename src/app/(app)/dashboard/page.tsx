@@ -29,7 +29,7 @@ export default function DashboardPage() {
         {/* <StatCard title="Missions Terminées" value={completedMissions} icon={CheckCircle} color="text-purple-400" /> */}
       </div>
 
-      <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
+      <div className="bg-card p-6 rounded-lg shadow-lg border border-border flex justify-center">
          <PrintReportButtons />
       </div>
     </div>
