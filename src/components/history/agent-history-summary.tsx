@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { getAgentMissionHistory } from '@/ai/flows/agent-mission-history';
 import { Agent } from '@/lib/types';
 import { Sparkles } from 'lucide-react';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 interface AgentHistorySummaryProps {
   agent: Agent;
@@ -41,11 +42,8 @@ export function AgentHistorySummary({ agent }: AgentHistorySummaryProps) {
       </CardHeader>
       <CardContent>
         {isLoading && (
-            <div className="flex items-center justify-center space-x-2">
-                <div className="h-2 w-2 animate-pulse rounded-full bg-accent"></div>
-                <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:0.2s]"></div>
-                <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:0.4s]"></div>
-                <span className="text-sm text-muted-foreground">Génération du résumé...</span>
+            <div className="flex items-center justify-center">
+                <LoadingSpinner text="Génération du résumé..." />
             </div>
         )}
         {error && <p className="text-destructive text-sm">{error}</p>}

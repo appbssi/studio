@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { getAppTutorial } from '@/ai/flows/app-tutorial';
 import { Sparkles, BookOpen } from 'lucide-react';
 import ReactMarkdown from 'react-markdown';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function TutorialPage() {
   const [tutorial, setTutorial] = useState('');
@@ -42,11 +43,8 @@ export default function TutorialPage() {
         </CardHeader>
         <CardContent className="prose dark:prose-invert max-w-none">
           {isLoading && (
-              <div className="flex items-center justify-center space-x-2 py-8">
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-accent"></div>
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:0.2s]"></div>
-                  <div className="h-2 w-2 animate-pulse rounded-full bg-accent [animation-delay:0.4s]"></div>
-                  <span className="text-sm text-muted-foreground">L'IA rédige le tutoriel...</span>
+              <div className="flex items-center justify-center py-8">
+                  <LoadingSpinner text="L'IA rédige le tutoriel..." />
               </div>
           )}
           {error && <p className="text-destructive text-sm">{error}</p>}

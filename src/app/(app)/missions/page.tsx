@@ -22,6 +22,7 @@ import {
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog"
 import { MissionAgentsDialog } from '@/components/missions/mission-agents-dialog';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function MissionsPage() {
   const { missions, agents, completeMission: completeMissionAction, isLoaded } = useData();
@@ -62,7 +63,7 @@ export default function MissionsPage() {
       return (
         <TableRow>
           <TableCell colSpan={4} className="text-center h-24">
-            Chargement des missions...
+            <LoadingSpinner text="Chargement des missions..." />
           </TableCell>
         </TableRow>
       );

@@ -64,3 +64,22 @@
     @apply bg-background text-foreground;
   }
 }
+
+@layer components {
+    .spinner-container {
+      @apply flex justify-center items-center space-x-2;
+    }
+  
+    .spinner-ball {
+      @apply w-3 h-3 rounded-full bg-accent;
+      animation: spinner-bounce 1.4s infinite ease-in-out both;
+    }
+  
+    .spinner-ball:nth-child(1) {
+      animation-delay: -0.32s;
+    }
+  
+    .spinner-ball:nth-child(2) {
+      animation-delay: -0.16s;
+    }
+}

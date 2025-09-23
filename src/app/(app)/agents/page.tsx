@@ -31,6 +31,7 @@ import {
 } from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
+import { LoadingSpinner } from '@/components/ui/loading-spinner';
 
 export default function AgentsPage() {
   const { agents, deleteAgent, getAgentStatus, isLoaded } = useData();
@@ -95,7 +96,7 @@ export default function AgentsPage() {
       return (
         <TableRow>
           <TableCell colSpan={7} className="text-center h-24">
-            Chargement des agents...
+            <LoadingSpinner text="Chargement des agents..." />
           </TableCell>
         </TableRow>
       );
@@ -152,7 +153,7 @@ export default function AgentsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="flex items-center justify-center mb-8">
+      <div className="flex items-center justify-center mb-8 gap-4">
         <h1 className="text-3xl font-bold">LISTE AGENTS</h1>
         <AddAgentDialog />
       </div>
@@ -169,7 +170,7 @@ export default function AgentsPage() {
               className="pl-10"
             />
           </div>
-          <div className="flex items-center gap-4 w-full sm:w-auto flex-wrap">
+          <div className="flex items-center gap-4 w-full sm:w-auto flex-wrap justify-center">
             <div className="flex items-center gap-2">
                 <Filter className="h-4 w-4 text-muted-foreground" />
                 <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AgentStatus | 'all')}>
