@@ -1,7 +1,7 @@
 "use client";
 
 import { useData } from '@/contexts/data-context';
-import { Mission, Agent } from '@/lib/types';
+import { Mission } from '@/lib/types';
 import {
   Dialog,
   DialogContent,
@@ -13,6 +13,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Users, Printer, FileDown } from 'lucide-react';
+import * as XLSX from 'xlsx';
 
 interface MissionAgentsDialogProps {
   mission: Mission;
@@ -73,30 +74,22 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
     }
   };
 
-  const exportToCsv = () => {
-    const headers = ['Prénom', 'Nom', 'Matricule', 'Grade', 'Contact'];
-    const csvRows = [
-      headers.join(','),
-      ...participatingAgents.map(agent => 
-        [
-          `"${agent.firstName}"`,
-          `"${agent.lastName}"`,
-          `"${agent.matricule}"`,
-          `"${agent.grade}"`,
-          `"${agent.contact}"`
-        ].join(',')
-      )
-    ];
+  const exportToXlsx = () => {
+    const dataToExport = participatingAgents.map(agent => ({
+      'Prénom': agent.firstName,
+      'Nom': agent.lastName,
+      'Matricule': agent.matricule,
+      'Grade': agent.grade,
+      'Contact': agent.contact,
+      'Adresse': agent.address
+    }));
     
-    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
-    const encodedUri = encodeURI(csvContent);
-    const link = document.createElement("a");
-    link.setAttribute("href", encodedUri);
-    const fileName = `agents_mission_${mission.title.replace(/\s+/g, '_')}.csv`;
-    link.setAttribute("download", fileName);
-    document.body.appendChild(link);
-    link.click();
-    document.body.removeChild(link);
+    const worksheet = XLSX.utils.json_to_sheet(dataToExport);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, 'Agents');
+    
+    const fileName = `agents_mission_${mission.title.replace(/\s+/g, '_')}.xlsx`;
+    XLSX.writeFile(workbook, fileName);
   };
 
   return (
@@ -137,9 +130,9 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
                 <Printer className="mr-2 h-4 w-4" />
                 Imprimer
             </Button>
-            <Button onClick={exportToCsv}>
+            <Button onClick={exportToXlsx}>
                 <FileDown className="mr-2 h-4 w-4" />
-                Exporter en CSV
+                Exporter en XLSX
             </Button>
         </div>
       </DialogContent>
