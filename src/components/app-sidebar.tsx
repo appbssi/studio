@@ -11,7 +11,6 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
-  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -59,7 +58,7 @@ export default function AppSidebar() {
         <Link href="/dashboard" className="flex items-center gap-2">
           <Shield className="h-8 w-8 text-accent" />
           <h1 className="text-xl font-bold text-white group-data-[collapsible=icon]:hidden">
-            RH-BSSI
+            SYGES-BSSI
           </h1>
         </Link>
       </SidebarHeader>
