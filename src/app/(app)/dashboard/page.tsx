@@ -18,7 +18,7 @@ export default function DashboardPage() {
     <div className="container mx-auto p-4 md:p-8">
       <div className="mb-8 flex justify-center">
         <h1 className="text-2xl font-bold text-center px-8 py-3 bg-card border-2 border-border rounded-lg shadow-lg">
-          SYGES-BSSI
+          BASE DE DONNEE BSSI
         </h1>
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
