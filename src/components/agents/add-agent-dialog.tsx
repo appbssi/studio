@@ -20,7 +20,7 @@ import { PlusCircle, UserPlus } from 'lucide-react';
 
 export function AddAgentDialog() {
   const [isOpen, setIsOpen] = useState(false);
-  const { addAgent } = useData();
+  const { addAgent, agents } = useData();
   const { toast } = useToast();
   const [newAgent, setNewAgent] = useState({
     firstName: '',
@@ -45,6 +45,16 @@ export function AddAgentDialog() {
       });
       return;
     }
+    
+    if (agents.some(agent => agent.matricule === newAgent.matricule)) {
+      toast({
+        variant: "destructive",
+        title: "Erreur de Matricule",
+        description: "Ce matricule est déjà utilisé par un autre agent. Veuillez en choisir un autre.",
+      });
+      return;
+    }
+
     addAgent(newAgent);
     toast({
       title: "Succès",
