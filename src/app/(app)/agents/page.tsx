@@ -158,7 +158,7 @@ export default function AgentsPage() {
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
-        <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
+        <div className="flex flex-wrap items-center justify-center mb-4 gap-4">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
