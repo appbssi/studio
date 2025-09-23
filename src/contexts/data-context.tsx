@@ -20,6 +20,7 @@ interface DataContextProps {
   addAgent: (agentData: Omit<Agent, 'id' | 'photoUrl'>) => Promise<void>;
   addMission: (missionData: Omit<Mission, 'id' | 'status'>) => Promise<void>;
   completeMission: (missionId: string) => Promise<void>;
+  extendMission: (missionId: string, newEndDate: string) => Promise<void>;
   deleteAgent: (agentId: string) => Promise<void>;
   getAgentById: (agentId: string) => Agent | undefined;
   getMissionById: (missionId: string) => Mission | undefined;
@@ -83,6 +84,11 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     await updateDoc(missionRef, { status: 'completed' });
   };
 
+  const extendMission = async (missionId: string, newEndDate: string) => {
+    const missionRef = doc(db, 'missions', missionId);
+    await updateDoc(missionRef, { endDate: newEndDate });
+  };
+
   const deleteAgent = async (agentId: string) => {
     const batch = writeBatch(db);
     missions.forEach(mission => {
@@ -109,7 +115,7 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   }, [missions]);
 
   return (
-    <DataContext.Provider value={{ agents, missions, isLoaded, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
+    <DataContext.Provider value={{ agents, missions, isLoaded, addAgent, addMission, completeMission, extendMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
       {children}
     </DataContext.Provider>
   );

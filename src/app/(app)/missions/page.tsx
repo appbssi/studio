@@ -4,6 +4,7 @@ import { useState, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
 import { Input } from '@/components/ui/input';
 import { AddMissionDialog } from '@/components/missions/add-mission-dialog';
+import { ExtendMissionDialog } from '@/components/missions/extend-mission-dialog';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -95,26 +96,29 @@ export default function MissionsPage() {
               </TooltipProvider>
             </div>
           </TableCell>
-          <TableCell className="text-right">
+          <TableCell className="text-right space-x-2">
             {mission.status !== 'completed' && (
-              <AlertDialog>
-                <AlertDialogTrigger asChild>
-                    <Button variant="outline" size="sm">Terminer</Button>
-                </AlertDialogTrigger>
-                <AlertDialogContent>
-                    <AlertDialogHeader>
-                        <AlertDialogTitle>Confirmer la fin de la mission ?</AlertDialogTitle>
-                        <AlertDialogDescription>
-                            Cette action marquera la mission "{mission.title}" comme terminée.
-                            Le statut des agents assignés sera mis à jour à "Disponible". Cette action est irréversible.
-                        </AlertDialogDescription>
-                    </AlertDialogHeader>
-                    <AlertDialogFooter>
-                        <AlertDialogCancel>Annuler</AlertDialogCancel>
-                        <AlertDialogAction onClick={() => handleCompleteMission(mission.id)}>Confirmer</AlertDialogAction>
-                    </AlertDialogFooter>
-                </AlertDialogContent>
-              </AlertDialog>
+              <>
+                <ExtendMissionDialog mission={mission} />
+                <AlertDialog>
+                  <AlertDialogTrigger asChild>
+                      <Button variant="outline" size="sm">Terminer</Button>
+                  </AlertDialogTrigger>
+                  <AlertDialogContent>
+                      <AlertDialogHeader>
+                          <AlertDialogTitle>Confirmer la fin de la mission ?</AlertDialogTitle>
+                          <AlertDialogDescription>
+                              Cette action marquera la mission "{mission.title}" comme terminée.
+                              Le statut des agents assignés sera mis à jour à "Disponible". Cette action est irréversible.
+                          </AlertDialogDescription>
+                      </AlertDialogHeader>
+                      <AlertDialogFooter>
+                          <AlertDialogCancel>Annuler</AlertDialogCancel>
+                          <AlertDialogAction onClick={() => handleCompleteMission(mission.id)}>Confirmer</AlertDialogAction>
+                      </AlertDialogFooter>
+                  </AlertDialogContent>
+                </AlertDialog>
+              </>
             )}
           </TableCell>
         </TableRow>
