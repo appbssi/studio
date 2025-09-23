@@ -120,9 +120,8 @@ export default function MissionsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-center mb-8">
         <h1 className="text-3xl font-bold">MISSIONS</h1>
-        <AddMissionDialog />
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
@@ -137,6 +136,7 @@ export default function MissionsPage() {
                     className="pl-10"
                 />
             </div>
+            <AddMissionDialog />
         </div>
 
         <div className="overflow-x-auto">
