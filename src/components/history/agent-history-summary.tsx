@@ -50,7 +50,7 @@ export function AgentHistorySummary({ agent }: AgentHistorySummaryProps) {
         {summary && <p className="text-sm text-muted-foreground whitespace-pre-wrap">{summary}</p>}
       </CardContent>
       <CardFooter>
-        <Button onClick={handleGenerateSummary} disabled={isLoading} className="w-full" variant="super">
+        <Button onClick={handleGenerateSummary} disabled={isLoading} className="w-full">
             <Sparkles className="mr-2 h-4 w-4" />
             {isLoading ? 'Génération...' : 'Générer le Résumé'}
         </Button>

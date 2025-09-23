@@ -49,7 +49,7 @@ export function ExtendMissionDialog({ mission }: ExtendMissionDialogProps) {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="secondary" size="sm">
+        <Button variant="outline" size="sm">
           <CalendarPlus className="mr-2 h-4 w-4" />
           Prolonger
         </Button>
@@ -75,9 +75,9 @@ export function ExtendMissionDialog({ mission }: ExtendMissionDialogProps) {
         </div>
         <DialogFooter>
             <DialogClose asChild>
-                <Button type="button" variant="secondary">Annuler</Button>
+                <Button type="button" variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit} variant="super">Confirmer</Button>
+            <Button type="submit" onClick={handleSubmit}>Confirmer</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>

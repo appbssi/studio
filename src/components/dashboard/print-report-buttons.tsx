@@ -119,11 +119,11 @@ export function PrintReportButtons() {
 
     return (
         <div className="flex flex-col sm:flex-row gap-4">
-            <Button onClick={() => printAgentsReport('available')} variant="super">
+            <Button onClick={() => printAgentsReport('available')}>
                 <Printer className="mr-2 h-4 w-4" />
                 AGENTS DISPONIBLE
             </Button>
-            <Button onClick={printAllAgentsReport} variant="super">
+            <Button onClick={printAllAgentsReport}>
                 <Printer className="mr-2 h-4 w-4" />
                 AGENTS ENREGISTRES
             </Button>

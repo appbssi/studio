@@ -85,7 +85,7 @@ export function AddMissionDialog() {
   return (
     <Dialog open={isOpen} onOpenChange={setIsOpen}>
       <DialogTrigger asChild>
-        <Button variant="super">
+        <Button>
           <PlusCircle className="mr-2 h-4 w-4" />
           Créer une Mission
         </Button>
@@ -147,9 +147,9 @@ export function AddMissionDialog() {
         </div>
         <DialogFooter>
             <DialogClose asChild>
-                <Button type="button" variant="secondary">Annuler</Button>
+                <Button type="button" variant="outline">Annuler</Button>
             </DialogClose>
-            <Button type="submit" onClick={handleSubmit} variant="super">Créer la Mission</Button>
+            <Button type="submit" onClick={handleSubmit}>Créer la Mission</Button>
         </DialogFooter>
       </DialogContent>
     </Dialog>
