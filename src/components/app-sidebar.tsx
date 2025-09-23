@@ -16,7 +16,6 @@ import {
   LayoutDashboard,
   Users,
   Briefcase,
-  History,
   BookOpen,
   Shield,
   ChevronsLeft,
@@ -28,7 +27,6 @@ const navItems = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
   { href: '/agents', label: 'Gestion des Agents', icon: Users },
   { href: '/missions', label: 'Gestion des Missions', icon: Briefcase },
-  { href: '/history', label: 'Historique', icon: History },
   { href: '/tutorial', label: 'Tutoriel', icon: BookOpen },
 ];
 
