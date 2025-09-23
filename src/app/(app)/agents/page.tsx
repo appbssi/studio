@@ -4,7 +4,7 @@ import { useState, useMemo } from 'react';
 import { useData } from '@/contexts/data-context';
 import { Input } from '@/components/ui/input';
 import { AddAgentDialog } from '@/components/agents/add-agent-dialog';
-import { Agent } from '@/lib/types';
+import { Agent, AgentStatus } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
@@ -36,6 +36,7 @@ export default function AgentsPage() {
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedGrade, setSelectedGrade] = useState('all');
+  const [statusFilter, setStatusFilter] = useState<AgentStatus | 'all'>('available');
 
   const uniqueGrades = useMemo(() => {
     const grades = new Set(agents.map(agent => agent.grade));
@@ -43,21 +44,27 @@ export default function AgentsPage() {
   }, [agents]);
 
   const filteredAgents = useMemo(() => {
-    let availableAgents = agents.filter(agent => getAgentStatus(agent.id) === 'available');
+    let filtered = agents;
 
-    if (selectedGrade !== 'all') {
-      availableAgents = availableAgents.filter(agent => agent.grade === selectedGrade);
+    if (statusFilter !== 'all') {
+      filtered = agents.filter(agent => getAgentStatus(agent.id) === statusFilter);
     }
     
-    if (!searchTerm) return availableAgents;
+    if (selectedGrade !== 'all') {
+      filtered = filtered.filter(agent => agent.grade === selectedGrade);
+    }
+    
+    if (searchTerm) {
+      filtered = filtered.filter(agent =>
+        agent.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        agent.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        agent.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        agent.contact.toLowerCase().includes(searchTerm.toLowerCase())
+      );
+    }
 
-    return availableAgents.filter(agent =>
-      agent.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.contact.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [agents, getAgentStatus, searchTerm, selectedGrade]);
+    return filtered;
+  }, [agents, getAgentStatus, searchTerm, selectedGrade, statusFilter]);
 
   const handleDeleteAgent = (agentId: string, agentName: string) => {
     deleteAgent(agentId);
@@ -66,6 +73,17 @@ export default function AgentsPage() {
       description: `L'agent ${agentName} a été supprimé.`,
     });
   }
+
+  const getStatusBadge = (status: AgentStatus) => {
+    switch (status) {
+      case 'available':
+        return <Badge variant='default' className='bg-green-600/20 text-green-400 border-green-600/30'>Disponible</Badge>;
+      case 'occupied':
+        return <Badge className="bg-yellow-600/20 text-yellow-400 border-yellow-600/30">Occupé</Badge>;
+      default:
+        return null;
+    }
+  };
 
   const renderTableBody = () => {
     if (!isLoaded) {
@@ -97,9 +115,7 @@ export default function AgentsPage() {
           <TableCell>{agent.contact}</TableCell>
           <TableCell>{agent.address}</TableCell>
           <TableCell>
-            <Badge variant='default' className='bg-green-600/20 text-green-400 border-green-600/30'>
-              Disponible
-            </Badge>
+            {getStatusBadge(getAgentStatus(agent.id))}
           </TableCell>
           <TableCell className="text-right">
              <AlertDialog>
@@ -130,7 +146,7 @@ export default function AgentsPage() {
       return (
         <TableRow>
           <TableCell colSpan={7} className="text-center h-24">
-            Aucun agent disponible trouvé.
+            Aucun agent trouvé.
           </TableCell>
         </TableRow>
       );
@@ -156,20 +172,35 @@ export default function AgentsPage() {
               className="pl-10"
             />
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
-            <Filter className="h-4 w-4 text-muted-foreground" />
-             <Select value={selectedGrade} onValueChange={setSelectedGrade}>
-              <SelectTrigger className="w-full sm:w-[180px]">
-                <SelectValue placeholder="Trier par grade" />
-              </SelectTrigger>
-              <SelectContent>
-                {uniqueGrades.map(grade => (
-                  <SelectItem key={grade} value={grade}>
-                    {grade === 'all' ? 'Tous les grades' : grade}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+          <div className="flex items-center gap-4 w-full sm:w-auto flex-wrap">
+            <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AgentStatus | 'all')}>
+                    <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectValue placeholder="Trier par statut" />
+                    </SelectTrigger>
+                    <SelectContent>
+                        <SelectItem value="available">Agents Disponibles</SelectItem>
+                        <SelectItem value="occupied">Agents Occupés</SelectItem>
+                        <SelectItem value="all">Tous les agents</SelectItem>
+                    </SelectContent>
+                </Select>
+            </div>
+            <div className="flex items-center gap-2">
+                <Filter className="h-4 w-4 text-muted-foreground" />
+                <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+                <SelectTrigger className="w-full sm:w-[180px]">
+                    <SelectValue placeholder="Trier par grade" />
+                </SelectTrigger>
+                <SelectContent>
+                    {uniqueGrades.map(grade => (
+                    <SelectItem key={grade} value={grade}>
+                        {grade === 'all' ? 'Tous les grades' : grade}
+                    </SelectItem>
+                    ))}
+                </SelectContent>
+                </Select>
+            </div>
           </div>
         </div>
         
