@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Button } from '@/components/ui/button';
 import {
   Sidebar,
   SidebarHeader,
@@ -10,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  SidebarTrigger,
 } from '@/components/ui/sidebar';
 import {
   LayoutDashboard,
@@ -18,7 +20,10 @@ import {
   History,
   BookOpen,
   Shield,
+  ChevronsLeft,
+  ChevronsRight
 } from 'lucide-react';
+import { useSidebar } from '@/components/ui/sidebar';
 
 const navItems = [
   { href: '/dashboard', label: 'Tableau de bord', icon: LayoutDashboard },
@@ -27,6 +32,23 @@ const navItems = [
   { href: '/history', label: 'Historique', icon: History },
   { href: '/tutorial', label: 'Tutoriel', icon: BookOpen },
 ];
+
+function SidebarCollapseButton() {
+  const { toggleSidebar, state } = useSidebar();
+  const isCollapsed = state === 'collapsed';
+
+  return (
+    <Button 
+      variant="ghost" 
+      size="icon" 
+      className="w-full h-12 justify-start p-3 bg-destructive/10 text-destructive-foreground/60 hover:bg-destructive/20 hover:text-destructive-foreground rounded-lg"
+      onClick={toggleSidebar}
+    >
+      {isCollapsed ? <ChevronsRight /> : <ChevronsLeft />}
+      <span className="group-data-[collapsible=icon]:hidden ml-2">{isCollapsed ? 'Ouvrir' : 'Fermer'}</span>
+    </Button>
+  )
+}
 
 export default function AppSidebar() {
   const pathname = usePathname();
@@ -61,7 +83,9 @@ export default function AppSidebar() {
           ))}
         </SidebarMenu>
       </SidebarContent>
-      <SidebarFooter></SidebarFooter>
+      <SidebarFooter className="p-4">
+        <SidebarCollapseButton />
+      </SidebarFooter>
     </Sidebar>
   );
 }
