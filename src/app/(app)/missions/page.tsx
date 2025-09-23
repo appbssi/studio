@@ -133,7 +133,7 @@ export default function MissionsPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Gestion des Missions</h1>
+        <h1 className="text-3xl font-bold">MISSIONS</h1>
         <AddMissionDialog />
       </div>
 
