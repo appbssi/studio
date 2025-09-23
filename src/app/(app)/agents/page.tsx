@@ -104,15 +104,7 @@ export default function AgentsPage() {
       return filteredAgents.map(agent => (
         <TableRow key={agent.id}>
           <TableCell>
-            <div className="flex items-center gap-3">
-              <Avatar>
-                <AvatarImage src={agent.photoUrl} alt={`${agent.firstName} ${agent.lastName}`} data-ai-hint="person portrait" />
-                <AvatarFallback>{agent.firstName.charAt(0)}{agent.lastName.charAt(0)}</AvatarFallback>
-              </Avatar>
-              <div>
-                <p className="font-medium">{agent.firstName} {agent.lastName}</p>
-              </div>
-            </div>
+            <p className="font-medium">{agent.firstName} {agent.lastName}</p>
           </TableCell>
           <TableCell>{agent.grade}</TableCell>
           <TableCell>{agent.matricule}</TableCell>
@@ -213,7 +205,7 @@ export default function AgentsPage() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>Agent</TableHead>
+                <TableHead>Nom</TableHead>
                 <TableHead>Grade</TableHead>
                 <TableHead>Matricule</TableHead>
                 <TableHead>Contact</TableHead>
