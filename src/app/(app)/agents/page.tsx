@@ -8,8 +8,6 @@ import { EditAgentDialog } from '@/components/agents/edit-agent-dialog';
 import { Agent, AgentStatus } from '@/lib/types';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { Badge } from '@/components/ui/badge';
-import Image from 'next/image';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 import { Search, Trash2, Filter } from 'lucide-react';
 import {
   AlertDialog,
@@ -118,7 +116,7 @@ export default function AgentsPage() {
              <EditAgentDialog agent={agent} />
              <AlertDialog>
               <AlertDialogTrigger asChild>
-                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                 <Button variant="destructive" size="icon">
                     <Trash2 className="h-4 w-4" />
                  </Button>
               </AlertDialogTrigger>
@@ -153,53 +151,53 @@ export default function AgentsPage() {
 
   return (
     <div className="container mx-auto p-4 md:p-8">
-      <div className="flex items-center justify-center mb-8 gap-4">
+      <div className="flex items-center justify-center mb-8">
         <h1 className="text-3xl font-bold">LISTE AGENTS</h1>
-        <AddAgentDialog />
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
-        <div className="flex flex-wrap items-center justify-center mb-4 gap-4">
-          <div className="relative w-full max-w-sm">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="text"
-              placeholder="Rechercher un agent..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
-            />
-          </div>
-          <div className="flex items-center gap-4 w-full sm:w-auto flex-wrap justify-center">
-            <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AgentStatus | 'all')}>
+        <div className="flex items-center justify-between mb-6">
+            <div className="flex flex-wrap items-center gap-4">
+                <div className="relative w-full max-w-sm">
+                    <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <Input
+                    type="text"
+                    placeholder="Rechercher un agent..."
+                    value={searchTerm}
+                    onChange={(e) => setSearchTerm(e.target.value)}
+                    className="pl-10"
+                    />
+                </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={statusFilter} onValueChange={(value) => setStatusFilter(value as AgentStatus | 'all')}>
+                        <SelectTrigger className="w-full sm:w-[180px]">
+                            <SelectValue placeholder="Trier par statut" />
+                        </SelectTrigger>
+                        <SelectContent>
+                            <SelectItem value="available">Agents Disponibles</SelectItem>
+                            <SelectItem value="occupied">Agents Occupés</SelectItem>
+                            <SelectItem value="all">Tous les agents</SelectItem>
+                        </SelectContent>
+                    </Select>
+                </div>
+                <div className="flex items-center gap-2">
+                    <Filter className="h-4 w-4 text-muted-foreground" />
+                    <Select value={selectedGrade} onValueChange={setSelectedGrade}>
                     <SelectTrigger className="w-full sm:w-[180px]">
-                        <SelectValue placeholder="Trier par statut" />
+                        <SelectValue placeholder="Trier par grade" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="available">Agents Disponibles</SelectItem>
-                        <SelectItem value="occupied">Agents Occupés</SelectItem>
-                        <SelectItem value="all">Tous les agents</SelectItem>
+                        {uniqueGrades.map(grade => (
+                        <SelectItem key={grade} value={grade}>
+                            {grade === 'all' ? 'Tous les grades' : grade}
+                        </SelectItem>
+                        ))}
                     </SelectContent>
-                </Select>
+                    </Select>
+                </div>
             </div>
-            <div className="flex items-center gap-2">
-                <Filter className="h-4 w-4 text-muted-foreground" />
-                <Select value={selectedGrade} onValueChange={setSelectedGrade}>
-                <SelectTrigger className="w-full sm:w-[180px]">
-                    <SelectValue placeholder="Trier par grade" />
-                </SelectTrigger>
-                <SelectContent>
-                    {uniqueGrades.map(grade => (
-                    <SelectItem key={grade} value={grade}>
-                        {grade === 'all' ? 'Tous les grades' : grade}
-                    </SelectItem>
-                    ))}
-                </SelectContent>
-                </Select>
-            </div>
-          </div>
+            <AddAgentDialog />
         </div>
         
         <div className="overflow-x-auto">
