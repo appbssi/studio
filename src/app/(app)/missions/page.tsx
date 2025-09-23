@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/alert-dialog"
 
 export default function MissionsPage() {
-  const { missions, agents, completeMission: completeMissionAction } = useData();
+  const { missions, agents, completeMission: completeMissionAction, isLoaded } = useData();
   const [searchTerm, setSearchTerm] = useState('');
   const { toast } = useToast();
 
@@ -51,6 +51,84 @@ export default function MissionsPage() {
         case 'completed': return <Badge className="bg-green-600/20 text-green-400 border-green-600/30">Terminée</Badge>;
     }
   }
+
+  const renderTableBody = () => {
+    if (!isLoaded) {
+      return (
+        <TableRow>
+          <TableCell colSpan={5} className="text-center h-24">
+            Chargement des missions...
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (filteredMissions.length > 0) {
+      return filteredMissions.map(mission => (
+        <TableRow key={mission.id}>
+          <TableCell>
+            <p className="font-medium">{mission.title}</p>
+            <p className="text-sm text-muted-foreground truncate max-w-xs">{mission.description}</p>
+          </TableCell>
+          <TableCell>{getStatusBadge(mission.status)}</TableCell>
+          <TableCell>
+            {new Date(mission.startDate).toLocaleDateString('fr-FR')} - {new Date(mission.endDate).toLocaleDateString('fr-FR')}
+          </TableCell>
+          <TableCell>
+            <div className="flex items-center -space-x-2">
+              <TooltipProvider>
+                {mission.agentIds.map(agentId => {
+                  const agent = agents.find(a => a.id === agentId);
+                  return agent ? (
+                    <Tooltip key={agentId}>
+                      <TooltipTrigger asChild>
+                        <Avatar className="border-2 border-card">
+                          <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person portrait" />
+                          <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
+                        </Avatar>
+                      </TooltipTrigger>
+                      <TooltipContent>
+                        <p>{agent.firstName} {agent.lastName}</p>
+                      </TooltipContent>
+                    </Tooltip>
+                  ) : null;
+                })}
+              </TooltipProvider>
+            </div>
+          </TableCell>
+          <TableCell className="text-right">
+            {mission.status !== 'completed' && (
+              <AlertDialog>
+                <AlertDialogTrigger asChild>
+                    <Button variant="outline" size="sm">Terminer</Button>
+                </AlertDialogTrigger>
+                <AlertDialogContent>
+                    <AlertDialogHeader>
+                        <AlertDialogTitle>Confirmer la fin de la mission ?</AlertDialogTitle>
+                        <AlertDialogDescription>
+                            Cette action marquera la mission "{mission.title}" comme terminée.
+                            Le statut des agents assignés sera mis à jour à "Disponible". Cette action est irréversible.
+                        </AlertDialogDescription>
+                    </AlertDialogHeader>
+                    <AlertDialogFooter>
+                        <AlertDialogCancel>Annuler</AlertDialogCancel>
+                        <AlertDialogAction onClick={() => handleCompleteMission(mission.id)}>Confirmer</AlertDialogAction>
+                    </AlertDialogFooter>
+                </AlertDialogContent>
+              </AlertDialog>
+            )}
+          </TableCell>
+        </TableRow>
+      ));
+    } else {
+      return (
+        <TableRow>
+          <TableCell colSpan={5} className="text-center h-24">
+            Aucune mission trouvée.
+          </TableCell>
+        </TableRow>
+      );
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -85,70 +163,7 @@ export default function MissionsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-            {filteredMissions.length > 0 ? (
-              filteredMissions.map(mission => (
-                <TableRow key={mission.id}>
-                  <TableCell>
-                    <p className="font-medium">{mission.title}</p>
-                    <p className="text-sm text-muted-foreground truncate max-w-xs">{mission.description}</p>
-                  </TableCell>
-                  <TableCell>{getStatusBadge(mission.status)}</TableCell>
-                  <TableCell>
-                    {new Date(mission.startDate).toLocaleDateString('fr-FR')} - {new Date(mission.endDate).toLocaleDateString('fr-FR')}
-                  </TableCell>
-                  <TableCell>
-                    <div className="flex items-center -space-x-2">
-                      <TooltipProvider>
-                        {mission.agentIds.map(agentId => {
-                          const agent = agents.find(a => a.id === agentId);
-                          return agent ? (
-                            <Tooltip key={agentId}>
-                              <TooltipTrigger asChild>
-                                <Avatar className="border-2 border-card">
-                                  <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person portrait" />
-                                  <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
-                                </Avatar>
-                              </TooltipTrigger>
-                              <TooltipContent>
-                                <p>{agent.firstName} {agent.lastName}</p>
-                              </TooltipContent>
-                            </Tooltip>
-                          ) : null;
-                        })}
-                      </TooltipProvider>
-                    </div>
-                  </TableCell>
-                  <TableCell className="text-right">
-                    {mission.status !== 'completed' && (
-                      <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                            <Button variant="outline" size="sm">Terminer</Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmer la fin de la mission ?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Cette action marquera la mission "{mission.title}" comme terminée.
-                                    Le statut des agents assignés sera mis à jour à "Disponible". Cette action est irréversible.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleCompleteMission(mission.id)}>Confirmer</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    )}
-                  </TableCell>
-                </TableRow>
-              ))
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={5} className="text-center h-24">
-                    Aucune mission trouvée.
-                  </TableCell>
-                </TableRow>
-              )}
+              {renderTableBody()}
             </TableBody>
           </Table>
         </div>

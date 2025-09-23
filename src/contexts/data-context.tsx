@@ -16,6 +16,7 @@ import {
 interface DataContextProps {
   agents: Agent[];
   missions: Mission[];
+  isLoaded: boolean;
   addAgent: (agentData: Omit<Agent, 'id' | 'photoUrl'>) => Promise<void>;
   addMission: (missionData: Omit<Mission, 'id' | 'status'>) => Promise<void>;
   completeMission: (missionId: string) => Promise<void>;
@@ -78,9 +79,6 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
   };
   
   const completeMission = async (missionId: string) => {
-    const mission = missions.find(m => m.id === missionId);
-    if (!mission) return;
-
     const missionRef = doc(db, 'missions', missionId);
     await updateDoc(missionRef, { status: 'completed' });
   };
@@ -110,16 +108,8 @@ export const DataProvider = ({ children }: { children: ReactNode }) => {
     return isOccupied ? 'occupied' : 'available';
   }, [missions]);
 
-  if (!isLoaded) {
-    return (
-      <div className="flex h-screen items-center justify-center bg-background">
-        <div className="h-16 w-16 animate-spin rounded-full border-4 border-solid border-primary border-t-transparent"></div>
-      </div>
-    );
-  }
-
   return (
-    <DataContext.Provider value={{ agents, missions, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
+    <DataContext.Provider value={{ agents, missions, isLoaded, addAgent, addMission, completeMission, deleteAgent, getAgentById, getMissionById, getAgentStatus }}>
       {children}
     </DataContext.Provider>
   );

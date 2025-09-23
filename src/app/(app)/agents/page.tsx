@@ -25,7 +25,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
 export default function AgentsPage() {
-  const { agents, deleteAgent, getAgentStatus } = useData();
+  const { agents, deleteAgent, getAgentStatus, isLoaded } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
 
@@ -47,6 +47,78 @@ export default function AgentsPage() {
       description: `L'agent ${agentName} a été supprimé.`,
     });
   }
+
+  const renderTableBody = () => {
+    if (!isLoaded) {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center h-24">
+            Chargement des agents...
+          </TableCell>
+        </TableRow>
+      );
+    }
+    if (filteredAgents.length > 0) {
+      return filteredAgents.map(agent => {
+        const status = getAgentStatus(agent.id);
+        return (
+        <TableRow key={agent.id}>
+          <TableCell>
+            <div className="flex items-center gap-3">
+              <Avatar>
+                <AvatarImage src={agent.photoUrl} alt={`${agent.firstName} ${agent.lastName}`} data-ai-hint="person portrait" />
+                <AvatarFallback>{agent.firstName.charAt(0)}{agent.lastName.charAt(0)}</AvatarFallback>
+              </Avatar>
+              <div>
+                <p className="font-medium">{agent.firstName} {agent.lastName}</p>
+                <p className="text-sm text-muted-foreground">ID: {agent.id}</p>
+              </div>
+            </div>
+          </TableCell>
+          <TableCell>{agent.grade}</TableCell>
+          <TableCell>{agent.matricule}</TableCell>
+          <TableCell>{agent.contact}</TableCell>
+          <TableCell>{agent.address}</TableCell>
+          <TableCell>
+            <Badge variant={status === 'available' ? 'default' : 'secondary'} className={status === 'available' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>
+              {status === 'available' ? 'Disponible' : 'Occupé'}
+            </Badge>
+          </TableCell>
+          <TableCell className="text-right">
+             <AlertDialog>
+              <AlertDialogTrigger asChild>
+                 <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
+                    <Trash2 className="h-4 w-4" />
+                 </Button>
+              </AlertDialogTrigger>
+              <AlertDialogContent>
+                  <AlertDialogHeader>
+                      <AlertDialogTitle>Confirmer la suppression ?</AlertDialogTitle>
+                      <AlertDialogDescription>
+                          Cette action supprimera définitivement l'agent "{agent.firstName} {agent.lastName}".
+                          Cette action est irréversible.
+                      </AlertDialogDescription>
+                  </AlertDialogHeader>
+                  <AlertDialogFooter>
+                      <AlertDialogCancel>Annuler</AlertDialogCancel>
+                      <AlertDialogAction onClick={() => handleDeleteAgent(agent.id, `${agent.firstName} ${agent.lastName}`)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Supprimer</AlertDialogAction>
+                  </AlertDialogFooter>
+              </AlertDialogContent>
+            </AlertDialog>
+          </TableCell>
+        </TableRow>
+        )
+      });
+    } else {
+      return (
+        <TableRow>
+          <TableCell colSpan={7} className="text-center h-24">
+            Aucun agent trouvé.
+          </TableCell>
+        </TableRow>
+      );
+    }
+  };
 
   return (
     <div className="container mx-auto p-4 md:p-8">
@@ -83,64 +155,7 @@ export default function AgentsPage() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {filteredAgents.length > 0 ? (
-                filteredAgents.map(agent => {
-                  const status = getAgentStatus(agent.id);
-                  return (
-                  <TableRow key={agent.id}>
-                    <TableCell>
-                      <div className="flex items-center gap-3">
-                        <Avatar>
-                          <AvatarImage src={agent.photoUrl} alt={`${agent.firstName} ${agent.lastName}`} data-ai-hint="person portrait" />
-                          <AvatarFallback>{agent.firstName.charAt(0)}{agent.lastName.charAt(0)}</AvatarFallback>
-                        </Avatar>
-                        <div>
-                          <p className="font-medium">{agent.firstName} {agent.lastName}</p>
-                          <p className="text-sm text-muted-foreground">ID: {agent.id}</p>
-                        </div>
-                      </div>
-                    </TableCell>
-                    <TableCell>{agent.grade}</TableCell>
-                    <TableCell>{agent.matricule}</TableCell>
-                    <TableCell>{agent.contact}</TableCell>
-                    <TableCell>{agent.address}</TableCell>
-                    <TableCell>
-                      <Badge variant={status === 'available' ? 'default' : 'secondary'} className={status === 'available' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>
-                        {status === 'available' ? 'Disponible' : 'Occupé'}
-                      </Badge>
-                    </TableCell>
-                    <TableCell className="text-right">
-                       <AlertDialog>
-                        <AlertDialogTrigger asChild>
-                           <Button variant="ghost" size="icon" className="text-destructive hover:text-destructive/80">
-                              <Trash2 className="h-4 w-4" />
-                           </Button>
-                        </AlertDialogTrigger>
-                        <AlertDialogContent>
-                            <AlertDialogHeader>
-                                <AlertDialogTitle>Confirmer la suppression ?</AlertDialogTitle>
-                                <AlertDialogDescription>
-                                    Cette action supprimera définitivement l'agent "{agent.firstName} {agent.lastName}".
-                                    Cette action est irréversible.
-                                </AlertDialogDescription>
-                            </AlertDialogHeader>
-                            <AlertDialogFooter>
-                                <AlertDialogCancel>Annuler</AlertDialogCancel>
-                                <AlertDialogAction onClick={() => handleDeleteAgent(agent.id, `${agent.firstName} ${agent.lastName}`)} className="bg-destructive text-destructive-foreground hover:bg-destructive/90">Supprimer</AlertDialogAction>
-                            </AlertDialogFooter>
-                        </AlertDialogContent>
-                      </AlertDialog>
-                    </TableCell>
-                  </TableRow>
-                  )
-                })
-              ) : (
-                <TableRow>
-                  <TableCell colSpan={7} className="text-center h-24">
-                    Aucun agent trouvé.
-                  </TableCell>
-                </TableRow>
-              )}
+              {renderTableBody()}
             </TableBody>
           </Table>
         </div>
