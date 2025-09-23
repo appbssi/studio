@@ -17,10 +17,10 @@ export function PrintReportButtons() {
               <head>
                 <title>Rapport des Agents Disponibles</title>
                 <style>
-                  body { font-family: 'Inter', sans-serif; margin: 20px; background-color: #1a1a1a; color: #f0f0f0; }
+                  body { font-family: 'Inter', sans-serif; margin: 20px; background-color: #1a1a1a; color: #f0f0f0; text-align: center; }
                   h1 { color: #30CED8; }
                   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                  th, td { border: 1px solid #444; padding: 12px; text-align: left; }
+                  th, td { border: 1px solid #444; padding: 12px; text-align: center; }
                   th { background-color: #282C34; }
                   tr:nth-child(even) { background-color: #21252b; }
                 </style>
@@ -65,10 +65,10 @@ export function PrintReportButtons() {
               <head>
                 <title>Rapport de Tous les Agents</title>
                 <style>
-                  body { font-family: 'Inter', sans-serif; margin: 20px; background-color: #1a1a1a; color: #f0f0f0; }
+                  body { font-family: 'Inter', sans-serif; margin: 20px; background-color: #1a1a1a; color: #f0f0f0; text-align: center; }
                   h1 { color: #30CED8; }
                   table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-                  th, td { border: 1px solid #444; padding: 12px; text-align: left; }
+                  th, td { border: 1px solid #444; padding: 12px; text-align: center; }
                   th { background-color: #282C34; }
                   tr:nth-child(even) { background-color: #21252b; }
                 </style>
