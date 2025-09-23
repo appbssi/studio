@@ -34,6 +34,7 @@ export default function AgentsPage() {
     return agents.filter(agent =>
       agent.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      agent.grade.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.contact.toLowerCase().includes(searchTerm.toLowerCase())
     );
@@ -73,6 +74,7 @@ export default function AgentsPage() {
             <TableHeader>
               <TableRow>
                 <TableHead>Agent</TableHead>
+                <TableHead>Grade</TableHead>
                 <TableHead>Matricule</TableHead>
                 <TableHead>Contact</TableHead>
                 <TableHead>Adresse</TableHead>
@@ -98,6 +100,7 @@ export default function AgentsPage() {
                         </div>
                       </div>
                     </TableCell>
+                    <TableCell>{agent.grade}</TableCell>
                     <TableCell>{agent.matricule}</TableCell>
                     <TableCell>{agent.contact}</TableCell>
                     <TableCell>{agent.address}</TableCell>
@@ -133,7 +136,7 @@ export default function AgentsPage() {
                 })
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className="text-center h-24">
+                  <TableCell colSpan={7} className="text-center h-24">
                     Aucun agent trouvé.
                   </TableCell>
                 </TableRow>

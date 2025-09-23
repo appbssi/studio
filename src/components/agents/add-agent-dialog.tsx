@@ -25,6 +25,7 @@ export function AddAgentDialog() {
   const [newAgent, setNewAgent] = useState({
     firstName: '',
     lastName: '',
+    grade: '',
     matricule: '',
     contact: '',
     address: ''
@@ -36,11 +37,11 @@ export function AddAgentDialog() {
   };
 
   const handleSubmit = () => {
-    if (!newAgent.firstName || !newAgent.lastName || !newAgent.matricule) {
+    if (!newAgent.firstName || !newAgent.lastName || !newAgent.matricule || !newAgent.grade) {
       toast({
         variant: "destructive",
         title: "Erreur de validation",
-        description: "Veuillez remplir tous les champs obligatoires (Prénom, Nom, Matricule).",
+        description: "Veuillez remplir tous les champs obligatoires (Prénom, Nom, Grade, Matricule).",
       });
       return;
     }
@@ -49,7 +50,7 @@ export function AddAgentDialog() {
       title: "Succès",
       description: `L'agent ${newAgent.firstName} ${newAgent.lastName} a été ajouté.`,
     });
-    setNewAgent({ firstName: '', lastName: '', matricule: '', contact: '', address: '' });
+    setNewAgent({ firstName: '', lastName: '', grade: '', matricule: '', contact: '', address: '' });
     setIsOpen(false);
   };
 
@@ -82,6 +83,12 @@ export function AddAgentDialog() {
               Nom *
             </Label>
             <Input id="lastName" name="lastName" value={newAgent.lastName} onChange={handleInputChange} className="col-span-3" />
+          </div>
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label htmlFor="grade" className="text-right">
+              Grade *
+            </Label>
+            <Input id="grade" name="grade" value={newAgent.grade} onChange={handleInputChange} className="col-span-3" />
           </div>
           <div className="grid grid-cols-4 items-center gap-4">
             <Label htmlFor="matricule" className="text-right">

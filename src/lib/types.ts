@@ -4,6 +4,7 @@ export interface Agent {
   id: string;
   firstName: string;
   lastName: string;
+  grade: string;
   matricule: string;
   contact: string;
   address: string;
