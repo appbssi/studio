@@ -82,7 +82,7 @@ export default function MissionsPage() {
                     <Tooltip key={agentId}>
                       <TooltipTrigger asChild>
                         <Avatar className="border-2 border-card">
-                          <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person portrait" />
+                          <AvatarImage src={agent.photoUrl} alt={agent.lastName} data-ai-hint="person" />
                           <AvatarFallback>{agent.firstName[0]}{agent.lastName[0]}</AvatarFallback>
                         </Avatar>
                       </TooltipTrigger>

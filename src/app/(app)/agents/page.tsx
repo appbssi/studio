@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { Badge } from '@/components/ui/badge';
 import Image from 'next/image';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Search, Trash2 } from 'lucide-react';
+import { Search, Trash2, Filter } from 'lucide-react';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -21,6 +21,13 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from "@/components/ui/alert-dialog";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '@/components/ui/select';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 
@@ -28,17 +35,29 @@ export default function AgentsPage() {
   const { agents, deleteAgent, getAgentStatus, isLoaded } = useData();
   const { toast } = useToast();
   const [searchTerm, setSearchTerm] = useState('');
+  const [selectedGrade, setSelectedGrade] = useState('all');
+
+  const uniqueGrades = useMemo(() => {
+    const grades = new Set(agents.map(agent => agent.grade));
+    return ['all', ...Array.from(grades)];
+  }, [agents]);
 
   const filteredAgents = useMemo(() => {
-    if (!searchTerm) return agents;
-    return agents.filter(agent =>
+    let availableAgents = agents.filter(agent => getAgentStatus(agent.id) === 'available');
+
+    if (selectedGrade !== 'all') {
+      availableAgents = availableAgents.filter(agent => agent.grade === selectedGrade);
+    }
+    
+    if (!searchTerm) return availableAgents;
+
+    return availableAgents.filter(agent =>
       agent.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      agent.grade.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.matricule.toLowerCase().includes(searchTerm.toLowerCase()) ||
       agent.contact.toLowerCase().includes(searchTerm.toLowerCase())
     );
-  }, [agents, searchTerm]);
+  }, [agents, getAgentStatus, searchTerm, selectedGrade]);
 
   const handleDeleteAgent = (agentId: string, agentName: string) => {
     deleteAgent(agentId);
@@ -59,9 +78,7 @@ export default function AgentsPage() {
       );
     }
     if (filteredAgents.length > 0) {
-      return filteredAgents.map(agent => {
-        const status = getAgentStatus(agent.id);
-        return (
+      return filteredAgents.map(agent => (
         <TableRow key={agent.id}>
           <TableCell>
             <div className="flex items-center gap-3">
@@ -80,8 +97,8 @@ export default function AgentsPage() {
           <TableCell>{agent.contact}</TableCell>
           <TableCell>{agent.address}</TableCell>
           <TableCell>
-            <Badge variant={status === 'available' ? 'default' : 'secondary'} className={status === 'available' ? 'bg-green-600/20 text-green-400 border-green-600/30' : 'bg-yellow-600/20 text-yellow-400 border-yellow-600/30'}>
-              {status === 'available' ? 'Disponible' : 'Occupé'}
+            <Badge variant='default' className='bg-green-600/20 text-green-400 border-green-600/30'>
+              Disponible
             </Badge>
           </TableCell>
           <TableCell className="text-right">
@@ -108,12 +125,12 @@ export default function AgentsPage() {
           </TableCell>
         </TableRow>
         )
-      });
+      );
     } else {
       return (
         <TableRow>
           <TableCell colSpan={7} className="text-center h-24">
-            Aucun agent trouvé.
+            Aucun agent disponible trouvé.
           </TableCell>
         </TableRow>
       );
@@ -123,12 +140,12 @@ export default function AgentsPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Gestion des Agents</h1>
+        <h1 className="text-3xl font-bold">Agents Disponibles</h1>
         <AddAgentDialog />
       </div>
 
       <div className="bg-card p-6 rounded-lg shadow-lg border border-border">
-        <div className="flex items-center justify-between mb-4 gap-4">
+        <div className="flex flex-wrap items-center justify-between mb-4 gap-4">
           <div className="relative w-full max-w-sm">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
             <Input
@@ -138,6 +155,21 @@ export default function AgentsPage() {
               onChange={(e) => setSearchTerm(e.target.value)}
               className="pl-10"
             />
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <Filter className="h-4 w-4 text-muted-foreground" />
+             <Select value={selectedGrade} onValueChange={setSelectedGrade}>
+              <SelectTrigger className="w-full sm:w-[180px]">
+                <SelectValue placeholder="Trier par grade" />
+              </SelectTrigger>
+              <SelectContent>
+                {uniqueGrades.map(grade => (
+                  <SelectItem key={grade} value={grade}>
+                    {grade === 'all' ? 'Tous les grades' : grade}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
           </div>
         </div>
         
