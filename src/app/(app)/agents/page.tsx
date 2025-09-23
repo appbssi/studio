@@ -140,7 +140,7 @@ export default function AgentsPage() {
   return (
     <div className="container mx-auto p-4 md:p-8">
       <div className="flex items-center justify-between mb-8">
-        <h1 className="text-3xl font-bold">Agents Disponibles</h1>
+        <h1 className="text-3xl font-bold">TOUT AGENTS</h1>
         <AddAgentDialog />
       </div>
 
