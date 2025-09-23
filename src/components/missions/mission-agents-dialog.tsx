@@ -12,7 +12,7 @@ import {
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
-import { Users, Printer } from 'lucide-react';
+import { Users, Printer, FileDown } from 'lucide-react';
 
 interface MissionAgentsDialogProps {
   mission: Mission;
@@ -73,6 +73,32 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
     }
   };
 
+  const exportToCsv = () => {
+    const headers = ['Prénom', 'Nom', 'Matricule', 'Grade', 'Contact'];
+    const csvRows = [
+      headers.join(','),
+      ...participatingAgents.map(agent => 
+        [
+          `"${agent.firstName}"`,
+          `"${agent.lastName}"`,
+          `"${agent.matricule}"`,
+          `"${agent.grade}"`,
+          `"${agent.contact}"`
+        ].join(',')
+      )
+    ];
+    
+    const csvContent = "data:text/csv;charset=utf-8," + csvRows.join('\n');
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    const fileName = `agents_mission_${mission.title.replace(/\s+/g, '_')}.csv`;
+    link.setAttribute("download", fileName);
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+  };
+
   return (
     <Dialog>
       <DialogTrigger asChild>
@@ -106,10 +132,14 @@ export function MissionAgentsDialog({ mission }: MissionAgentsDialogProps) {
                 <p className="text-muted-foreground text-center">Aucun agent n'est assigné à cette mission.</p>
             )}
         </div>
-        <div className="flex justify-end">
-            <Button onClick={printAgentsList}>
+        <div className="flex justify-end gap-2">
+            <Button onClick={printAgentsList} variant="outline">
                 <Printer className="mr-2 h-4 w-4" />
-                Imprimer la liste
+                Imprimer
+            </Button>
+            <Button onClick={exportToCsv}>
+                <FileDown className="mr-2 h-4 w-4" />
+                Exporter en CSV
             </Button>
         </div>
       </DialogContent>
